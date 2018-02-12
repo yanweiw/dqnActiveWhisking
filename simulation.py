@@ -4,6 +4,36 @@ import math
 
 root3 = np.sqrt(3)
 
+def genData(num_tri):
+    '''
+    Generate dataset of a num_tri of triangles and a num_hax of hexagons
+    The data for each is num_tri samples * 10 steps * 19 whisker distances
+    '''
+    tri_data = np.ones((num_tri, 10, 19))
+    config = np.zeros((num_tri, 10, 7))
+    for i in range(0, num_tri):
+        x = np.random.randint(5, 16, dtype=np.uint8)
+        y = np.random.randint(5, 16, dtype=np.uint8)
+        t = np.random.uniform(0, 2 * np.pi, dtype=np.float32)
+        s = np.random.uniform(6, 17, dtype=np.float32)
+        for j in range(0, 5):
+            X = np.random.randint(0, 21, dtype=np.uint8)
+            Y = np.random.randint(0, 21, dtype=np.uint8)
+            Z = np.random.randint(1, 11, dtype=np.uint8)
+            tri_data[i][j] = getDist(0, x, y, t, s, X, Y, Z)
+        for j in range(5, 10):
+            X = x
+            Y = y
+            Z = np.random.randint(1, 10, dtype=np.uint8)
+            tri_data[i][j] = getDist(0, x, y, t, s, X, Y, Z)
+        return tri_data
+
+def decodeData(tri_data, i, j):
+
+
+
+
+
 def getDist(label, x, y, t, s, X, Y, Z):
     '''
     Input:
@@ -18,7 +48,7 @@ def getDist(label, x, y, t, s, X, Y, Z):
     outer circle of whiskers are tilted 45 degree away from the center whisker.
     X ~ (0, 20),
     Y ~ (0, 20),
-    Z ~ (0, 10), bottom left corner is (0, 0, 0) and top right corner is (20, 20, 0) at z = 0
+    Z ~ (1, 10), bottom left corner is (0, 0, 0) and top right corner is (20, 20, 0) at z = 0
     s ~ (6, 16) for triangle, (3, 8) for hexagon
     t ~ (0, 2pi)
     x ~ (5, 15)
@@ -36,7 +66,7 @@ def getDist(label, x, y, t, s, X, Y, Z):
     # check whether the contact positions are within the labeled shape
     on_shape, bound_vec = onShape(label, x, y, t, s, cont_pos)
     # draw and return measured distances
-    drawObserv(on_shape, bound_vec, cont_pos)
+    # drawObserv(on_shape, bound_vec, cont_pos, x, y)
     return on_shape * head_to_cont + ~on_shape * 1000
 
 
@@ -73,10 +103,10 @@ def onShape(label, x, y, t, s, cont_pos):
     bound_vec = np.dot(np.array([[np.cos(t), -np.sin(t)], [np.sin(t), np.cos(t)]]), bound_vec) # rotate ccw by t
     rela_cont_pos = cont_pos - np.array([[x], [y]]) # relative to shape centered frame
     # check if within shape by dot products with boundary vectors
-    on_shape = np.full((1, cont_pos.shape[1]), True)
+    on_shape = np.full((1, cont_pos.shape[1]), False)
     for i in range(0, bound_vec.shape[1]):
         new_mask = within_tri(np.hstack((bound_vec[:,[i]], bound_vec[:, [(i+1) % bound_vec.shape[1]]])), rela_cont_pos)
-        on_shape = np.logical_and(on_shape, new_mask)
+        on_shape = np.logical_or(on_shape, new_mask)
     return on_shape, bound_vec
 
 
@@ -91,7 +121,7 @@ def within_tri(A, b):
     return np.all(np.vstack((mask1, mask2, mask3)), axis=0, keepdims=True)
 
 
-def drawObserv(on_shape, bound_vec, cont_pos):
+def drawObserv(on_shape, bound_vec, cont_pos, x, y):
     plt.ion() # interactive mode
     plt.figure(figsize=(8,8))
     plt.xlim(-4,4)
