@@ -1,0 +1,5 @@
+![1](images/tri_1.png)
+![2](images/tri_2.png)
+![3](images/tri_3.png)
+![4](images/tri_4.png)
+![5](images/tri_5.png)
