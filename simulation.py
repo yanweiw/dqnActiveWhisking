@@ -4,32 +4,64 @@ import math
 
 root3 = np.sqrt(3)
 
-def genData(num_tri):
+def genTriData(num_tri):
     '''
-    Generate dataset of a num_tri of triangles and a num_hex of hexagons
+    Generate dataset of a num_tri of triangles
     The data for each is num_tri samples * 10 steps * 19 whisker distances
     '''
     tri_data = np.zeros((num_tri, 10, 19))
-    config = np.zeros((num_tri, 10, 8))
+    t_config = np.zeros((num_tri, 10, 8))
     for i in range(0, num_tri):
         x = np.random.randint(5, 16, dtype=np.uint8)
         y = np.random.randint(5, 16, dtype=np.uint8)
         t = np.random.uniform(0, 2 * np.pi)
         s = np.random.uniform(6, 17)
-        config[i, :, 1:5] = x, y, t, s
+        t_config[i, :, 1:5] = x, y, t, s
         for j in range(0, 5):
             X = np.random.randint(0, 21, dtype=np.uint8)
             Y = np.random.randint(0, 21, dtype=np.uint8)
             Z = np.random.randint(1, 11, dtype=np.uint8)
-            config[i, j, 5:8] = X, Y, Z
-            tri_data[i, j] = getDist(config[i, j])
+            t_config[i, j, 5:8] = X, Y, Z
+            tri_data[i, j] = getDist(t_config[i, j])
         for j in range(5, 10):
             X = x
             Y = y
             Z = np.random.randint(1, 10, dtype=np.uint8)
-            config[i, j, 5:8] = X, Y, Z
-            tri_data[i, j] = getDist(config[i, j])
-    return tri_data, config
+            t_config[i, j, 5:8] = X, Y, Z
+            tri_data[i, j] = getDist(t_config[i, j])
+    np.save('data/tri_data_%d' % num_tri, tri_data)
+    np.save('data/t_config_%d' % num_tri, t_config)
+    return tri_data, t_config
+
+
+def genHexData(num_hex):
+    '''
+    Generate dataset of a num_hex of hexagons
+    The data for each is num_hex samples * 10 steps * 19 whisker distances
+    '''
+    hex_data = np.zeros((num_hex, 10, 19))
+    h_config = np.ones((num_hex, 10, 8))
+    for i in range(0, num_hex):
+        x = np.random.randint(5, 16, dtype=np.uint8)
+        y = np.random.randint(5, 16, dtype=np.uint8)
+        t = np.random.uniform(0, 2 * np.pi)
+        s = np.random.uniform(6, 17)
+        h_config[i, :, 1:5] = x, y, t, s
+        for j in range(0, 5):
+            X = np.random.randint(0, 21, dtype=np.uint8)
+            Y = np.random.randint(0, 21, dtype=np.uint8)
+            Z = np.random.randint(1, 11, dtype=np.uint8)
+            h_config[i, j, 5:8] = X, Y, Z
+            hex_data[i, j] = getDist(h_config[i, j])
+        for j in range(5, 10):
+            X = x + s / 2.0
+            Y = y
+            Z = np.random.randint(1, 10, dtype=np.uint8)
+            h_config[i, j, 5:8] = X, Y, Z
+            hex_data[i, j] = getDist(h_config[i, j])
+    np.save('data/hex_data_%d' % num_hex, hex_data)
+    np.save('data/h_config_%d' % num_hex, h_config)
+    return hex_data, h_config
 
 
 def decodeData(config, i):
@@ -63,8 +95,6 @@ def decodeData(config, i):
         plt.triplot(bound_vec[0,:], bound_vec[1,:])
         plt.plot(cont_pos[0, on_shape[0]], cont_pos[1, on_shape[0]], 'r.')
         plt.plot(cont_pos[0, ~on_shape[0]], cont_pos[1, ~on_shape[0]], 'k.')
-
-
 
 
 def getDist(config, draw=False):
