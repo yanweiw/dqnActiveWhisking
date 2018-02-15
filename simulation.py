@@ -6,35 +6,68 @@ root3 = np.sqrt(3)
 
 def genData(num_tri):
     '''
-    Generate dataset of a num_tri of triangles and a num_hax of hexagons
+    Generate dataset of a num_tri of triangles and a num_hex of hexagons
     The data for each is num_tri samples * 10 steps * 19 whisker distances
     '''
-    tri_data = np.ones((num_tri, 10, 19))
-    config = np.zeros((num_tri, 10, 7))
+    tri_data = np.zeros((num_tri, 10, 19))
+    config = np.zeros((num_tri, 10, 8))
     for i in range(0, num_tri):
         x = np.random.randint(5, 16, dtype=np.uint8)
         y = np.random.randint(5, 16, dtype=np.uint8)
-        t = np.random.uniform(0, 2 * np.pi, dtype=np.float32)
-        s = np.random.uniform(6, 17, dtype=np.float32)
+        t = np.random.uniform(0, 2 * np.pi)
+        s = np.random.uniform(6, 17)
+        config[i, :, 1:5] = x, y, t, s
         for j in range(0, 5):
             X = np.random.randint(0, 21, dtype=np.uint8)
             Y = np.random.randint(0, 21, dtype=np.uint8)
             Z = np.random.randint(1, 11, dtype=np.uint8)
-            tri_data[i][j] = getDist(0, x, y, t, s, X, Y, Z)
+            config[i, j, 5:8] = X, Y, Z
+            tri_data[i, j] = getDist(config[i, j])
         for j in range(5, 10):
             X = x
             Y = y
             Z = np.random.randint(1, 10, dtype=np.uint8)
-            tri_data[i][j] = getDist(0, x, y, t, s, X, Y, Z)
-        return tri_data
-
-def decodeData(tri_data, i, j):
-
+            config[i, j, 5:8] = X, Y, Z
+            tri_data[i, j] = getDist(config[i, j])
+    return tri_data, config
 
 
+def decodeData(config, i):
+    '''
+    draw observation and verify data
+    '''
+    plt.ion() # interactive mode
+    fig, ax = plt.subplots(2, 3, figsize=(30, 20))
+    for j in range(0, 5):
+        label, x, y, t, s, X, Y, Z = config[i, j]
+        cont_pos, head_to_cont = getContactPos(X, Y, Z)
+        on_shape, bound_vec = onShape(label, x, y, t, s, cont_pos)
+        plt.subplot(2, 3, j + 1)
+        plt.xlim(0, 20)
+        plt.ylim(0, 20)
+        bound_vec = np.insert(bound_vec, 0, 0, axis=1) # append origin at front
+        bound_vec = bound_vec + np.array([[x], [y]]) # transform to global frame
+        plt.triplot(bound_vec[0,:], bound_vec[1,:])
+        plt.plot(cont_pos[0, on_shape[0]], cont_pos[1, on_shape[0]], 'r.')
+        plt.plot(cont_pos[0, ~on_shape[0]], cont_pos[1, ~on_shape[0]], 'k.')
+    fig, ax = plt.subplots(2, 3, figsize=(30, 20))
+    for j in range(5, 10):
+        label, x, y, t, s, X, Y, Z = config[i, j]
+        cont_pos, head_to_cont = getContactPos(X, Y, Z)
+        on_shape, bound_vec = onShape(label, x, y, t, s, cont_pos)
+        plt.subplot(2, 3, j -4)
+        plt.xlim(0, 20)
+        plt.ylim(0, 20)
+        bound_vec = np.insert(bound_vec, 0, 0, axis=1) # append origin at front
+        bound_vec = bound_vec + np.array([[x], [y]]) # transform to global frame
+        plt.triplot(bound_vec[0,:], bound_vec[1,:])
+        plt.plot(cont_pos[0, on_shape[0]], cont_pos[1, on_shape[0]], 'r.')
+        plt.plot(cont_pos[0, ~on_shape[0]], cont_pos[1, ~on_shape[0]], 'k.')
 
 
-def getDist(label, x, y, t, s, X, Y, Z):
+
+
+def getDist(config, draw=False):
     '''
     Input:
 
@@ -59,15 +92,17 @@ def getDist(label, x, y, t, s, X, Y, Z):
     Return an array of 19 L2 distances between the root of whisker 0 - 18 and the x-y plane at Z = 0.
     Whisker 0 is center whisker. Whisker 1 - 6 starts at (1, 0) counterclockwise in the inner circle.
     Whisker 7 - 18 starts at (1.732, 0) counterclockwise in the outercircle. The outer circle twice as
-    dense as inner circle. If laser lands outside of the shape, returned length is 1000.
+    dense as inner circle. If laser lands outside of the shape, returned length is 0.
     '''
+    label, x, y, t, s, X, Y, Z = config
     # distance from head to contact regardless if within shape
     cont_pos, head_to_cont = getContactPos(X, Y, Z)
     # check whether the contact positions are within the labeled shape
     on_shape, bound_vec = onShape(label, x, y, t, s, cont_pos)
     # draw and return measured distances
-    # drawObserv(on_shape, bound_vec, cont_pos, x, y)
-    return on_shape * head_to_cont + ~on_shape * 1000
+    if draw:
+        drawObserv(on_shape, bound_vec, cont_pos, x, y)
+    return on_shape * head_to_cont + ~on_shape * 0
 
 
 def getContactPos(X, Y, Z):
@@ -115,17 +150,17 @@ def within_tri(A, b):
     return True if point b is within the triangle spanned by the two column vectors of A
     '''
     on_shape = np.linalg.solve(A, b)
-    mask1 = np.all((on_shape >= 0), axis=0, keepdims=True)
-    mask2 = np.all((on_shape <= 1), axis=0, keepdims=True)
-    mask3 = np.sum(on_shape, axis=0, keepdims=True) <= 1
+    mask1 = np.all((on_shape > - 0.000001), axis=0, keepdims=True) # prevent rounding issue
+    mask2 = np.all((on_shape < 1.000001), axis=0, keepdims=True)
+    mask3 = np.sum(on_shape, axis=0, keepdims=True) < 1.000001
     return np.all(np.vstack((mask1, mask2, mask3)), axis=0, keepdims=True)
 
 
 def drawObserv(on_shape, bound_vec, cont_pos, x, y):
     plt.ion() # interactive mode
     plt.figure(figsize=(8,8))
-    plt.xlim(-4,4)
-    plt.ylim(-4,4)
+    plt.xlim(0, 20)
+    plt.ylim(0, 20)
     bound_vec = np.insert(bound_vec, 0, 0, axis=1) # append origin at front
     bound_vec = bound_vec + np.array([[x], [y]]) # transform to global frame
     plt.triplot(bound_vec[0,:], bound_vec[1,:])
