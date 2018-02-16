@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -17,13 +20,13 @@ def genTriData(num_tri):
         t = np.random.uniform(0, 2 * np.pi)
         s = np.random.uniform(6, 17)
         t_config[i, :, 1:5] = x, y, t, s
-        for j in range(0, 5):
+        for j in range(0, 10):
             X = np.random.randint(0, 21, dtype=np.uint8)
             Y = np.random.randint(0, 21, dtype=np.uint8)
             Z = np.random.randint(1, 11, dtype=np.uint8)
             t_config[i, j, 5:8] = X, Y, Z
             tri_data[i, j] = getDist(t_config[i, j])
-        for j in range(5, 10):
+        for j in range(10, 10):
             X = x
             Y = y
             Z = np.random.randint(1, 10, dtype=np.uint8)
@@ -47,13 +50,13 @@ def genHexData(num_hex):
         t = np.random.uniform(0, 2 * np.pi)
         s = np.random.uniform(6, 17)
         h_config[i, :, 1:5] = x, y, t, s
-        for j in range(0, 5):
+        for j in range(0, 10):
             X = np.random.randint(0, 21, dtype=np.uint8)
             Y = np.random.randint(0, 21, dtype=np.uint8)
             Z = np.random.randint(1, 11, dtype=np.uint8)
             h_config[i, j, 5:8] = X, Y, Z
             hex_data[i, j] = getDist(h_config[i, j])
-        for j in range(5, 10):
+        for j in range(10, 10):
             X = x + s / 2.0
             Y = y
             Z = np.random.randint(1, 10, dtype=np.uint8)
@@ -196,3 +199,18 @@ def drawObserv(on_shape, bound_vec, cont_pos, x, y):
     plt.triplot(bound_vec[0,:], bound_vec[1,:])
     plt.plot(cont_pos[0, on_shape[0]], cont_pos[1, on_shape[0]], 'r.')
     plt.plot(cont_pos[0, ~on_shape[0]], cont_pos[1, ~on_shape[0]], 'k.')
+
+
+def main():
+    '''
+    Main function to generate datasets
+    '''
+    num = int(sys.argv[1])
+    print("Generating %d triangle data points..." % num)
+    genTriData(num)
+    print("Generating %d hexagon points..." % num)
+    genHexData(num)
+
+
+if __name__ == '__main__':
+    main()
