@@ -18,14 +18,18 @@ print(len(x_test), 'test_sequences; x_test shape:', x_test.shape)
 
 print('Build model...')
 model = Sequential()
-model.add(LSTM(100, input_shape=(10, 19)))
-model.add(Dense(1, activation='sigmoid'))
+model.add(LSTM(100, input_shape=(10, 19), name='lstm'))
+model.add(Dense(64, activation='relu', name='state'))
+model.add(Dense(1, activation='sigmoid', name='guess'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
 
-print('fitting...')
+print('Fitting...')
 model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=2, batch_size=64)
 
-print('predicting...')
+print('Validating...')
 scores = model.evaluate(x_test, y_test, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
+
+print('Saving the model...')
+model.save('models/lstm_tri_hex.h5')
