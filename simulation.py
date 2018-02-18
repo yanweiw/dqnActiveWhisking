@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+num_random_step = 10
 root3 = np.sqrt(3)
 
 def genTriData(num_tri):
@@ -20,18 +21,19 @@ def genTriData(num_tri):
         t = np.random.uniform(0, 2 * np.pi)
         s = np.random.uniform(6, 17)
         t_config[i, :, 1:5] = x, y, t, s
-        for j in range(0, 10):
+        for j in range(0, num_random_step):
             X = np.random.randint(0, 21, dtype=np.uint8)
             Y = np.random.randint(0, 21, dtype=np.uint8)
             Z = np.random.randint(1, 11, dtype=np.uint8)
             t_config[i, j, 5:8] = X, Y, Z
             tri_data[i, j] = getDist(t_config[i, j])
-        for j in range(10, 10):
-            X = x
-            Y = y
-            Z = np.random.randint(1, 10, dtype=np.uint8)
-            t_config[i, j, 5:8] = X, Y, Z
-            tri_data[i, j] = getDist(t_config[i, j])
+        # for j in range(num_random_step, 10):
+        j = np.random.randint(0, 10, dtype=np.uint8)
+        X = x
+        Y = y
+        Z = np.random.randint(1, 10, dtype=np.uint8)
+        t_config[i, j, 5:8] = X, Y, Z
+        tri_data[i, j] = getDist(t_config[i, j])
     np.save('data/tri_data_%d' % num_tri, tri_data)
     np.save('data/t_config_%d' % num_tri, t_config)
     return tri_data, t_config
@@ -50,18 +52,19 @@ def genHexData(num_hex):
         t = np.random.uniform(0, 2 * np.pi)
         s = np.random.uniform(6, 17)
         h_config[i, :, 1:5] = x, y, t, s
-        for j in range(0, 10):
+        for j in range(0, num_random_step):
             X = np.random.randint(0, 21, dtype=np.uint8)
             Y = np.random.randint(0, 21, dtype=np.uint8)
             Z = np.random.randint(1, 11, dtype=np.uint8)
             h_config[i, j, 5:8] = X, Y, Z
             hex_data[i, j] = getDist(h_config[i, j])
-        for j in range(10, 10):
-            X = x + s / 2.0
-            Y = y
-            Z = np.random.randint(1, 10, dtype=np.uint8)
-            h_config[i, j, 5:8] = X, Y, Z
-            hex_data[i, j] = getDist(h_config[i, j])
+        # for j in range(num_random_step, 10):
+        j = np.random.randint(0, 10, dtype=np.uint8)
+        X = x + s / 2.0
+        Y = y
+        Z = np.random.randint(1, 10, dtype=np.uint8)
+        h_config[i, j, 5:8] = X, Y, Z
+        hex_data[i, j] = getDist(h_config[i, j])
     np.save('data/hex_data_%d' % num_hex, hex_data)
     np.save('data/h_config_%d' % num_hex, h_config)
     return hex_data, h_config

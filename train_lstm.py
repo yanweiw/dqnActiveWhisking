@@ -4,9 +4,9 @@ from keras.preprocessing import sequence
 from keras.models import Sequential
 from keras.layers import LSTM
 from keras.layers import Dense
+from keras.layers import TimeDistributed
 import numpy as np
 
-batch_size = 32
 
 print('Loading data...')
 x_train = np.vstack((np.load('data/tri_data_1000.npy'), np.load('data/hex_data_1000.npy')))
@@ -18,18 +18,33 @@ print(len(x_test), 'test_sequences; x_test shape:', x_test.shape)
 
 print('Build model...')
 model = Sequential()
-model.add(LSTM(100, input_shape=(10, 19), name='lstm'))
-model.add(Dense(64, activation='relu', name='state'))
+model.add(LSTM(100, input_shape=(None, 19), name='lstm'))
+# model.add(Dense(64, activation='relu', name='state'))
 model.add(Dense(1, activation='sigmoid', name='guess'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
 
 print('Fitting...')
-model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=2, batch_size=64)
+model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=3, batch_size=64)
+
+print('Build another model...')
+model2 = Sequential()
+model2.add(LSTM(100, input_shape=(None, 19), name='lstm', return_sequences=True))
+model2.add(TimeDistributed(Dense(1, activation='sigmoid', name='guess')))
+print('Copy weights...')
+model2.set_weights(model.get_weights())
+model2.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+print(model.summary())
 
 print('Validating...')
-scores = model.evaluate(x_test, y_test, verbose=0)
-print("Accuracy: %.2f%%" % (scores[1]*100))
+for i in range(1, 11):
+    x_t = x_test[[0], 0:i, :]
+    # model.reset_states()
+    # scores = model.evaluate(x_t, y_test, verbose=0)
+    print("Accuracy: %.2f%%" % (scores[1]*100))
+
+
+
 
 print('Saving the model...')
 model.save('models/lstm_tri_hex.h5')
