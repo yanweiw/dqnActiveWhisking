@@ -27,24 +27,28 @@ print(model.summary())
 print('Fitting...')
 model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=3, batch_size=64)
 
-print('Build another model...')
+print('Build another model of batch_size = 1...')
 model2 = Sequential()
-model2.add(LSTM(100, input_shape=(None, 19), name='lstm', return_sequences=True))
-model2.add(TimeDistributed(Dense(1, activation='sigmoid', name='guess')))
+model2.add(LSTM(100, batch_input_shape=(1, 1, 19), name='lstm', stateful=True))
+model2.add(Dense(1, activation='sigmoid', name='guess'))
 print('Copy weights...')
 model2.set_weights(model.get_weights())
 model2.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 print(model.summary())
 
-print('Validating...')
-for i in range(1, 11):
-    x_t = x_test[[0], 0:i, :]
-    # model.reset_states()
-    # scores = model.evaluate(x_t, y_test, verbose=0)
-    print("Accuracy: %.2f%%" % (scores[1]*100))
+# print('Validating...')
+# for i in range(1, 11):
+#     x_t = x_test[[0], 0:i, :]
+#     # model.reset_states()
+#     # scores = model.evaluate(x_t, y_test, verbose=0)
+#     print("Accuracy: %.2f%%" % (scores[1]*100))
 
-
-
+print('Evaluating...')
+model2.reset_states()
+for i in range(0, 10):
+    print(model2.evaluate(x_test[0:1, [i], :], np.zeros((1,1)), batch_size=1))
+    # can also use predict
+    # print(model2.predict(x_test[0:1, [i], :]))
 
 print('Saving the model...')
 model.save('models/lstm_tri_hex.h5')
