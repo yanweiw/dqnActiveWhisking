@@ -5,7 +5,8 @@ from keras.models import Sequential
 from keras.layers import LSTM
 from keras.layers import Dense
 from keras.layers import TimeDistributed
-from keras.backend as K
+from keras import backend as K
+from keras.models import Model
 import numpy as np
 
 
@@ -52,6 +53,10 @@ for i in range(0, 10):
     output_states.append(K.get_value(model2.layers[0].states[1])) # layer 0 is the lstm, states[0] is memory, states[1] is output
     # can also use predict
     # print(model2.predict(x_test[0:1, [i], :]))
+
+model3=Model(inputs=model2.input, outupts=model2.get_layer('lstm').output)
+
+
 
 print('Saving the model...')
 model.save('models/lstm_tri_hex.h5')
