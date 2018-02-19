@@ -5,6 +5,7 @@ from keras.models import Sequential
 from keras.layers import LSTM
 from keras.layers import Dense
 from keras.layers import TimeDistributed
+from keras.backend as K
 import numpy as np
 
 
@@ -45,8 +46,10 @@ print(model.summary())
 
 print('Evaluating...')
 model2.reset_states()
+output_states = []
 for i in range(0, 10):
     print(model2.evaluate(x_test[0:1, [i], :], np.zeros((1,1)), batch_size=1))
+    output_states.append(K.get_value(model2.layers[0].states[1])) # layer 0 is the lstm, states[0] is memory, states[1] is output
     # can also use predict
     # print(model2.predict(x_test[0:1, [i], :]))
 
