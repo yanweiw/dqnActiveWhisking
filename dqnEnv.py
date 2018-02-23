@@ -65,7 +65,7 @@ class dqnEnv:
         self.qValue -= reward # notice it is negative reward
         self.state = new_state
         terminal = False
-        if reward < 0.2:
+        if reward < 0.3:
             terminal = True
         return reward, new_state, terminal
 
