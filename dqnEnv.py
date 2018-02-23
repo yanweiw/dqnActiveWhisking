@@ -3,7 +3,7 @@
 from keras.models import load_model
 from keras import backend as K
 import numpy as np
-import simulation.py as sim
+import simulation as sim
 
 class dqnEnv:
     def __init__(self, rnnpath='models/lstm_tri_hex.h5'):
@@ -18,8 +18,9 @@ class dqnEnv:
         self.shapeY = np.random.randint(5, 16, dtype=np.uint8)
         self.shapeT = np.random.uniform(0, 2 * np.pi)
         self.shapeS = np.random.uniform(6, 17)
-        self.Qvalue = 100   # initial prediction of accumulated rewards, as future rewards are negative
+        self.qValue = 10   # initial prediction of accumulated rewards, as future rewards are negative
         self.rnn = load_model(rnnpath)
+        self.rnn.reset_states()
         self.state = K.get_value(self.rnn.layers[0].states[1])
 
 
@@ -28,7 +29,6 @@ class dqnEnv:
         Function to restart another sequence of simulations
         Return the first state produced by first observation after reset the stateful rnn
         '''
-        print('Reseting environment...')
         self.agentX = np.random.randint(0, 21, dtype=np.uint8)
         self.agentY = np.random.randint(0, 21, dtype=np.uint8)
         self.agentZ = np.random.randint(1, 11, dtype=np.uint8)
@@ -38,10 +38,10 @@ class dqnEnv:
         self.shapeT = np.random.uniform(0, 2 * np.pi)
         self.shapeS = np.random.uniform(6, 17)
         self.rnn.reset_states()
-        # self.Qvalue = 100
-        # Fist observation in the sequence corresponding to "stay action"
-        self.step(self, 0)
-        self.Qvalue = 100 # maybe inital Qvalue shouldn't be dependent on chance
+        # self.qValue = 10
+        # Fist observation in the sequence corresponding to a "stay action"
+        self.step(0)
+        self.qValue = 10 # maybe inital qValue should be renewed after inital step # Equality at birth
         return self.state
 
 
@@ -52,16 +52,17 @@ class dqnEnv:
         Return reward and state
         '''
         self.updateAgentPos(action)
-        observation = sim.getDist(self.shape, self.shapeX, self.shapeY, self.shapeT, self.shapeS, \
-                                    self.agentX, self.agentY, self.agentZ).reshape(1, 1, 19)
+        config = [self.shape, self.shapeX, self.shapeY, self.shapeT, self.shapeS, \
+                                    self.agentX, self.agentY, self.agentZ]
+        observation = sim.getDist(config).reshape(1, 1, 19)
         label = np.zeros((1,1))
         if not self.shape:
             label = np.ones((1,1))
         # evaluate loss as reward
-        reward = rnn.evaluate(observation, label, batch_size=1, verbose=0)
-        new_state = K.get_value(rnn.layers[0].states[1])
+        reward = self.rnn.evaluate(observation, label, batch_size=1, verbose=0)[0]
+        new_state = K.get_value(self.rnn.layers[0].states[1])
         # update reward and state
-        self.Qvalue -= reward # notice it is negative reward
+        self.qValue -= reward # notice it is negative reward
         self.state = new_state
         return reward, new_state
 

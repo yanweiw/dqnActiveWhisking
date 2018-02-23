@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Felix Yanwei Wang @ Northwestern University MSR, Feb 2018
+
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -107,6 +109,7 @@ def getDist(config, draw=False):
     '''
     Input:
 
+    Config is a 1d array of the following 8 entries:
     Label = 0 is equilateral triangle, label = 1, is equilateral hexagon;
     For triangle, (x, y) is a corner such that other corners are (s, 0) and (0.5*s, 1.732*s/2);
     for non-zero t, further rotates the x-y Coordinates counter clockwise by t. s is the side length.

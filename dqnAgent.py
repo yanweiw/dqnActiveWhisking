@@ -1,18 +1,22 @@
 # Felix Yanwei Wang @ Northwestern University MSR, Feb 2018
 # Acknowledgement: code borrows heavily from https://keon.io/deep-q-learning/#Cartpole-Game
 
+from collections import deque
 from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import Adam
 import numpy as np
+import random
 
 class dqnAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
-        self.gamma = 0.95  # discount rate
-        self.epsilon = 1.0 # exploration rate
+        self.gamma = 0.8  # discount rate
+        self.epsilon = 0.3 # exploration rate
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 0.999
         self.learning_rate = 0.001
         self.model = self._build_model()
 
@@ -23,6 +27,7 @@ class dqnAgent:
         model = Sequential()
         model.add(Dense(64, input_dim=self.state_size, activation='relu'))
         model.add(Dense(32, activation='relu'))
+        model.add(Dense(16, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
