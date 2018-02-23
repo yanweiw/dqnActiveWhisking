@@ -28,7 +28,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']
 print(model.summary())
 
 print('Fitting...')
-model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=2, batch_size=64)
+model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=3, batch_size=64)
 
 print('Building another stateful model of batch_size = 1...')
 model2 = Sequential()
@@ -49,7 +49,7 @@ print(model.summary())
 print('Evaluating...')
 model2.reset_states()
 output_states = []
-for i in range(0, 10):
+for i in range(0, 50):
     print(model2.evaluate(x_test[302:303, [i], :], np.ones((1,1)), batch_size=1))
     output_states.append(K.get_value(model2.layers[0].states[1])) # layer 0 is the lstm, states[0] is memory, states[1] is output
     # can also use predict

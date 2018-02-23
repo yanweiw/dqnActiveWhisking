@@ -64,7 +64,10 @@ class dqnEnv:
         # update reward and state
         self.qValue -= reward # notice it is negative reward
         self.state = new_state
-        return reward, new_state
+        terminal = False
+        if reward < 0.2:
+            terminal = True
+        return reward, new_state, terminal
 
 
     def updateAgentPos(self, action):

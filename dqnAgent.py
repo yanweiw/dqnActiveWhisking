@@ -13,7 +13,7 @@ class dqnAgent:
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
-        self.gamma = 0.8  # discount rate
+        self.gamma = 0.9  # discount rate
         self.epsilon = 0.3 # exploration rate
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.999
@@ -27,7 +27,7 @@ class dqnAgent:
         model = Sequential()
         model.add(Dense(64, input_dim=self.state_size, activation='relu'))
         model.add(Dense(32, activation='relu'))
-        model.add(Dense(16, activation='relu'))
+        # model.add(Dense(16, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model

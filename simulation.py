@@ -7,30 +7,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-num_random_step = 10
 root3 = np.sqrt(3)
 
-def genTriData(num_tri):
+def genTriData(num_tri, step_size):
     '''
     Generate dataset of a num_tri of triangles
-    The data for each is num_tri samples * 10 steps * 19 whisker distances
+    The data for each is num_tri samples * step_size * 19 whisker distances
     '''
-    tri_data = np.zeros((num_tri, 10, 19))
-    t_config = np.zeros((num_tri, 10, 8))
+    tri_data = np.zeros((num_tri, step_size, 19))
+    t_config = np.zeros((num_tri, step_size, 8))
     for i in range(0, num_tri):
         x = np.random.randint(5, 16, dtype=np.uint8)
         y = np.random.randint(5, 16, dtype=np.uint8)
         t = np.random.uniform(0, 2 * np.pi)
         s = np.random.uniform(6, 17)
         t_config[i, :, 1:5] = x, y, t, s
-        for j in range(0, num_random_step):
+        for j in range(0, step_size):
             X = np.random.randint(0, 21, dtype=np.uint8)
             Y = np.random.randint(0, 21, dtype=np.uint8)
             Z = np.random.randint(1, 11, dtype=np.uint8)
             t_config[i, j, 5:8] = X, Y, Z
             tri_data[i, j] = getDist(t_config[i, j])
-        # for j in range(num_random_step, 10):
-        j = np.random.randint(0, 10, dtype=np.uint8)
+        j = np.random.randint(0, step_size, dtype=np.uint8)
         X = x
         Y = y
         Z = np.random.randint(1, 10, dtype=np.uint8)
@@ -41,27 +39,26 @@ def genTriData(num_tri):
     return tri_data, t_config
 
 
-def genHexData(num_hex):
+def genHexData(num_hex, step_size):
     '''
     Generate dataset of a num_hex of hexagons
-    The data for each is num_hex samples * 10 steps * 19 whisker distances
+    The data for each is num_hex samples * step_size * 19 whisker distances
     '''
-    hex_data = np.zeros((num_hex, 10, 19))
-    h_config = np.ones((num_hex, 10, 8))
+    hex_data = np.zeros((num_hex, step_size, 19))
+    h_config = np.ones((num_hex, step_size, 8))
     for i in range(0, num_hex):
         x = np.random.randint(5, 16, dtype=np.uint8)
         y = np.random.randint(5, 16, dtype=np.uint8)
         t = np.random.uniform(0, 2 * np.pi)
         s = np.random.uniform(6, 17)
         h_config[i, :, 1:5] = x, y, t, s
-        for j in range(0, num_random_step):
+        for j in range(0, step_size):
             X = np.random.randint(0, 21, dtype=np.uint8)
             Y = np.random.randint(0, 21, dtype=np.uint8)
             Z = np.random.randint(1, 11, dtype=np.uint8)
             h_config[i, j, 5:8] = X, Y, Z
             hex_data[i, j] = getDist(h_config[i, j])
-        # for j in range(num_random_step, 10):
-        j = np.random.randint(0, 10, dtype=np.uint8)
+        j = np.random.randint(0, step_size, dtype=np.uint8)
         X = x + s / 2.0
         Y = y
         Z = np.random.randint(1, 10, dtype=np.uint8)
@@ -72,30 +69,22 @@ def genHexData(num_hex):
     return hex_data, h_config
 
 
-def decodeData(config, i):
+def decodeData(config, i, k):
     '''
-    draw observation and verify data
+    draw six observations at a time and verify data
+    i is the ith example, k is the jth time step to start
     '''
     plt.ion() # interactive mode
     fig, ax = plt.subplots(2, 3, figsize=(30, 20))
-    for j in range(0, 5):
+    max_step = len(config[0])
+    end = k + 6
+    if end > max_step:
+        end = max_step
+    for j in range(k, end):
         label, x, y, t, s, X, Y, Z = config[i, j]
         cont_pos, head_to_cont = getContactPos(X, Y, Z)
         on_shape, bound_vec = onShape(label, x, y, t, s, cont_pos)
-        plt.subplot(2, 3, j + 1)
-        plt.xlim(0, 20)
-        plt.ylim(0, 20)
-        bound_vec = np.insert(bound_vec, 0, 0, axis=1) # append origin at front
-        bound_vec = bound_vec + np.array([[x], [y]]) # transform to global frame
-        plt.triplot(bound_vec[0,:], bound_vec[1,:])
-        plt.plot(cont_pos[0, on_shape[0]], cont_pos[1, on_shape[0]], 'r.')
-        plt.plot(cont_pos[0, ~on_shape[0]], cont_pos[1, ~on_shape[0]], 'k.')
-    fig, ax = plt.subplots(2, 3, figsize=(30, 20))
-    for j in range(5, 10):
-        label, x, y, t, s, X, Y, Z = config[i, j]
-        cont_pos, head_to_cont = getContactPos(X, Y, Z)
-        on_shape, bound_vec = onShape(label, x, y, t, s, cont_pos)
-        plt.subplot(2, 3, j -4)
+        plt.subplot(2, 3, j - k + 1)
         plt.xlim(0, 20)
         plt.ylim(0, 20)
         bound_vec = np.insert(bound_vec, 0, 0, axis=1) # append origin at front

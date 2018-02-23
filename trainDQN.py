@@ -6,9 +6,9 @@ from keras.models import load_model
 import dqnEnv as de
 import dqnAgent as da
 
-episodes = 5000
-N_episodes = 100
-time_span = 10
+episodes = 1000
+N_episodes = 50
+max_exploration = 100
 
 # initialize environment and the agent
 env = de.dqnEnv('models/lstm_tri_hex.h5')
@@ -20,12 +20,13 @@ for e in range(1, episodes+1):
     curr_state = env.reset()
     if e % N_episodes == 1:   # the first entry in N_episodes
         score = 0
+        steps = 0.0
     # begin time sequence
-    for t in range(time_span):
+    for t in range(1, max_exploration+1):
         action = agent.act(curr_state)
-        reward, next_state = env.step(action)
-        terminal = False
-        if t == time_span - 1:
+        reward, next_state, terminal = env.step(action)
+        # terminal = False
+        if t == max_exploration:
             terminal = True
         # remember the transition
         agent.remember(curr_state, action, reward, next_state, terminal)
@@ -35,12 +36,15 @@ for e in range(1, episodes+1):
 
         if terminal:
             score += env.qValue
+            steps += t
             if e % N_episodes == 0:
-                print('episodes: {}/{}, score: {}'.format(e, episodes, score / N_episodes))
+                print('episodes: {}/{}, score: {}, steps: {}'.format(e, episodes, \
+                                                                score / N_episodes, steps / N_episodes))
+            break
 
     # train dqn with gradient descent on past experience
-    if e > 50:
-        agent.replay(500)
+    if len(agent.memory) > 32:
+        agent.replay(32)
 
 print('Saving trained DQN model...')
 agent.model.save('models/dqn_episodes_%d.h5' % episodes)
