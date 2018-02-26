@@ -5,20 +5,27 @@ from keras import backend as K
 import numpy as np
 import simulation as sim
 
+
 class dqnEnv:
     def __init__(self, rnnpath='models/lstm_tri_hex.h5'):
-        self.width = 20     # x ~ (0, 20)
-        self.height = 20    # y ~ (0, 20)
-        self.depth = 10     # z ~ (0, 20)
-        self.agentX = np.random.randint(0, 21, dtype=np.uint8)
-        self.agentY = np.random.randint(0, 21, dtype=np.uint8)
-        self.agentZ = np.random.randint(1, 11, dtype=np.uint8)
+        self.max_width = 16     # x ~ (0, 20)
+        self.min_width = 6
+        # self.height = 20    # y ~ (0, 20)
+        self.max_depth = 7     # z ~ (0, 20)
+        self.min_depth = 2
+        self.max_shape_pos = 13
+        self.min_shape_pos = 8
+        self.max_s = 10
+        self.min_s = 6
+        self.agentX = np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
+        self.agentY = np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
+        self.agentZ = np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
         self.shape = np.random.choice([0, 1])
-        self.shapeX = np.random.randint(5, 16, dtype=np.uint8)
-        self.shapeY = np.random.randint(5, 16, dtype=np.uint8)
+        self.shapeX = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
+        self.shapeY = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
         self.shapeT = np.random.uniform(0, 2 * np.pi)
-        self.shapeS = np.random.uniform(6, 17)
-        self.qValue = 10   # initial prediction of accumulated rewards, as future rewards are negative
+        self.shapeS = np.random.uniform(self.min_s, self.max_s)
+        self.qValue = 20   # initial prediction of accumulated rewards, as future rewards are negative
         self.rnn = load_model(rnnpath)
         self.rnn.reset_states()
         self.state = K.get_value(self.rnn.layers[0].states[1])
@@ -29,19 +36,19 @@ class dqnEnv:
         Function to restart another sequence of simulations
         Return the first state produced by first observation after reset the stateful rnn
         '''
-        self.agentX = np.random.randint(0, 21, dtype=np.uint8)
-        self.agentY = np.random.randint(0, 21, dtype=np.uint8)
-        self.agentZ = np.random.randint(1, 11, dtype=np.uint8)
+        self.agentX = np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
+        self.agentY = np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
+        self.agentZ = np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
         self.shape = np.random.choice([0, 1])
-        self.shapeX = np.random.randint(5, 16, dtype=np.uint8)
-        self.shapeY = np.random.randint(5, 16, dtype=np.uint8)
+        self.shapeX = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
+        self.shapeY = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
         self.shapeT = np.random.uniform(0, 2 * np.pi)
-        self.shapeS = np.random.uniform(6, 17)
+        self.shapeS = np.random.uniform(self.min_s, self.max_s)
         self.rnn.reset_states()
-        # self.qValue = 10
+        # self.qValue = 20
         # Fist observation in the sequence corresponding to a "stay action"
         self.step(0)
-        self.qValue = 10 # maybe inital qValue should be renewed after inital step # Equality at birth
+        self.qValue = 20 # maybe inital qValue should be renewed after inital step # Equality at birth
         return self.state
 
 
@@ -82,17 +89,17 @@ class dqnEnv:
         5: agentZ++
         6: agentZ--
         '''
-        if (action == 1) and (self.agentX + 1 <= 20):
+        if (action == 1) and (self.agentX + 1 < self.max_width):
             self.agentX += 1
-        elif (action == 2) and (self.agentY + 1 <= 20):
+        elif (action == 2) and (self.agentY + 1 < self.max_width):
             self.agentY += 1
-        elif (action == 3) and (self.agentX - 1 >= 0):
+        elif (action == 3) and (self.agentX - 1 >= self.min_width):
             self.agentX -= 1
-        elif (action == 4) and (self.agentY - 1 >= 0):
+        elif (action == 4) and (self.agentY - 1 >= self.min_width):
             self.agentY -= 1
-        elif (action == 5) and (self.agentZ + 1 <= 10):
+        elif (action == 5) and (self.agentZ + 1 < self.max_depth):
             self.agentZ += 1
-        elif (action == 6) and (self.agentZ - 1 >= 1):
+        elif (action == 6) and (self.agentZ - 1 >= self.min_depth):
             self.agentZ -= 1
         else:
             pass # corresponding to action == 0

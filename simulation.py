@@ -8,6 +8,16 @@ import matplotlib.pyplot as plt
 import math
 
 root3 = np.sqrt(3)
+# positions of head
+max_width = 16 # 21
+min_width = 6 # 0
+max_depth = 7 # 11
+min_depth = 2
+# positions of shape
+max_x = 13 # 16
+min_x = 8 # 5
+max_s = 12 # 17
+min_s = 6
 
 def genTriData(num_tri, step_size):
     '''
@@ -17,21 +27,21 @@ def genTriData(num_tri, step_size):
     tri_data = np.zeros((num_tri, step_size, 19))
     t_config = np.zeros((num_tri, step_size, 8))
     for i in range(0, num_tri):
-        x = np.random.randint(5, 16, dtype=np.uint8)
-        y = np.random.randint(5, 16, dtype=np.uint8)
+        x = np.random.randint(min_x, max_x, dtype=np.uint8)
+        y = np.random.randint(min_x, max_x, dtype=np.uint8)
         t = np.random.uniform(0, 2 * np.pi)
-        s = np.random.uniform(6, 17)
+        s = np.random.uniform(min_s, max_s)
         t_config[i, :, 1:5] = x, y, t, s
         for j in range(0, step_size):
-            X = np.random.randint(0, 21, dtype=np.uint8)
-            Y = np.random.randint(0, 21, dtype=np.uint8)
-            Z = np.random.randint(1, 11, dtype=np.uint8)
+            X = np.random.randint(min_width, max_width, dtype=np.uint8)
+            Y = np.random.randint(min_width, max_width, dtype=np.uint8)
+            Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
             t_config[i, j, 5:8] = X, Y, Z
             tri_data[i, j] = getDist(t_config[i, j])
         j = np.random.randint(0, step_size, dtype=np.uint8)
         X = x
         Y = y
-        Z = np.random.randint(1, 10, dtype=np.uint8)
+        Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
         t_config[i, j, 5:8] = X, Y, Z
         tri_data[i, j] = getDist(t_config[i, j])
     np.save('data/tri_data_%d' % num_tri, tri_data)
@@ -47,21 +57,21 @@ def genHexData(num_hex, step_size):
     hex_data = np.zeros((num_hex, step_size, 19))
     h_config = np.ones((num_hex, step_size, 8))
     for i in range(0, num_hex):
-        x = np.random.randint(5, 16, dtype=np.uint8)
-        y = np.random.randint(5, 16, dtype=np.uint8)
+        x = np.random.randint(min_x, max_x, dtype=np.uint8)
+        y = np.random.randint(min_x, max_x, dtype=np.uint8)
         t = np.random.uniform(0, 2 * np.pi)
-        s = np.random.uniform(6, 17)
+        s = np.random.uniform(min_s, max_s)
         h_config[i, :, 1:5] = x, y, t, s
         for j in range(0, step_size):
-            X = np.random.randint(0, 21, dtype=np.uint8)
-            Y = np.random.randint(0, 21, dtype=np.uint8)
-            Z = np.random.randint(1, 11, dtype=np.uint8)
+            X = np.random.randint(0, max_width, dtype=np.uint8)
+            Y = np.random.randint(0, max_width, dtype=np.uint8)
+            Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
             h_config[i, j, 5:8] = X, Y, Z
             hex_data[i, j] = getDist(h_config[i, j])
         j = np.random.randint(0, step_size, dtype=np.uint8)
         X = x + s / 2.0
         Y = y
-        Z = np.random.randint(1, 10, dtype=np.uint8)
+        Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
         h_config[i, j, 5:8] = X, Y, Z
         hex_data[i, j] = getDist(h_config[i, j])
     np.save('data/hex_data_%d' % num_hex, hex_data)

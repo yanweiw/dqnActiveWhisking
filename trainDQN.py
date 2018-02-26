@@ -6,9 +6,9 @@ from keras.models import load_model
 import dqnEnv as de
 import dqnAgent as da
 
-episodes = 1000
+episodes = 5000
 N_episodes = 50
-max_exploration = 100
+max_exploration = 30
 
 # initialize environment and the agent
 env = de.dqnEnv('models/lstm_tri_hex.h5')
