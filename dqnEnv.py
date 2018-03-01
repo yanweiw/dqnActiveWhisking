@@ -19,13 +19,13 @@ class dqnEnv:
         self.min_s = 6
         self.agentX = np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
         self.agentY = np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
-        self.agentZ = np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
+        self.agentZ = 7
         self.shape = np.random.choice([0, 1])
         self.shapeX = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
         self.shapeY = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
         self.shapeT = np.random.uniform(0, 2 * np.pi)
         self.shapeS = np.random.uniform(self.min_s, self.max_s)
-        self.qValue = 20   # initial prediction of accumulated rewards, as future rewards are negative
+        self.qValue = 0 # initial prediction of accumulated rewards, as future rewards are negative
         self.rnn = load_model(rnnpath)
         self.rnn.reset_states()
         self.state = K.get_value(self.rnn.layers[0].states[1])
@@ -38,7 +38,7 @@ class dqnEnv:
         '''
         self.agentX = np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
         self.agentY = np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
-        self.agentZ = np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
+        self.agentZ = 7#np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
         self.shape = np.random.choice([0, 1])
         self.shapeX = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
         self.shapeY = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
@@ -48,7 +48,7 @@ class dqnEnv:
         # self.qValue = 20
         # Fist observation in the sequence corresponding to a "stay action"
         self.step(0)
-        self.qValue = 20 # maybe inital qValue should be renewed after inital step # Equality at birth
+        self.qValue = 0 # maybe inital qValue should be renewed after inital step # Equality at birth
         return self.state
 
 
@@ -66,14 +66,16 @@ class dqnEnv:
         if not self.shape:
             label = np.ones((1,1))
         # evaluate loss as reward
-        reward = self.rnn.evaluate(observation, label, batch_size=1, verbose=0)[0]
+        loss = self.rnn.evaluate(observation, label, batch_size=1, verbose=0)[0]
         new_state = K.get_value(self.rnn.layers[0].states[1])
         # update reward and state
-        self.qValue -= reward # notice it is negative reward
         self.state = new_state
         terminal = False
-        if reward < 0.3:
+        reward = - loss * 10
+        if loss < 0.3:
             terminal = True
+            reward = 100.0
+        self.qValue += reward
         return reward, new_state, terminal
 
 

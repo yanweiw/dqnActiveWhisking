@@ -8,7 +8,7 @@ import dqnAgent as da
 
 episodes = 5000
 N_episodes = 50
-max_exploration = 30
+max_exploration = 15
 
 # initialize environment and the agent
 env = de.dqnEnv('models/lstm_tri_hex.h5')

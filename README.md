@@ -18,9 +18,9 @@
 1. I am using the hidden state vector of LSTM layer to approximate state
 2. Maybe use some more direct state representation such as consecutive observations
 
-### 3. Neural network not deep enough / hyperparameters
+### 4. Neural network not deep enough / hyperparameters
 
-1. Current network trains for 20 min. Should I start looking at GPU? 
+1. Current network trains for 20 min. Should I start looking at GPU?
 2. exploration decay parameter
 
 

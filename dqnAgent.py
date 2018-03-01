@@ -14,9 +14,9 @@ class dqnAgent:
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
         self.gamma = 0.9  # discount rate
-        self.epsilon = 0.5 # exploration rate
+        self.epsilon = 0.1 # exploration rate
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.99
+        self.epsilon_decay = 0.95
         self.learning_rate = 0.001
         self.model = self._build_model()
 
