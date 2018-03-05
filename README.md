@@ -1,5 +1,25 @@
 # The beautiful demos of learned agents hide all the blood, sweat, and tears that go into creating them.
 
+![1](images/learn_to_stay.png)
+
+![1](images/explore1.png)
+
+![1](images/explore2.png)
+
+![1](images/explore3.png)
+
+![1](images/test1.png)
+
+![1](images/test2.png)
+
+![1](images/test3.png)
+
+
+
+
+
+
+
 ### 1. The data is too sparse
 
 1. learned that all behavior results in randomness, and this knowledge is burned in

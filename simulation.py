@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 
 # Felix Yanwei Wang @ Northwestern University MSR, Feb 2018
 
@@ -10,9 +10,9 @@ import math
 root3 = np.sqrt(3)
 # positions of head
 max_width = 16 # 21
-min_width = 6 # 0
-max_depth = 7 # 11
-min_depth = 2
+min_width = 5 # 0
+max_depth = 6 # 11
+min_depth = 1
 # positions of shape
 max_x = 13 # 16
 min_x = 8 # 5
