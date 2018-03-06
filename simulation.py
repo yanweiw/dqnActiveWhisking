@@ -11,13 +11,13 @@ root3 = np.sqrt(3)
 # positions of head
 max_width = 16 # 21
 min_width = 5 # 0
-max_depth = 6 # 11
+max_depth = 9 # 11
 min_depth = 1
 # positions of shape
-max_x = 13 # 16
-min_x = 8 # 5
-max_s = 12 # 17
-min_s = 6
+max_x = 16#13 # 16
+min_x = 5#8 # 5
+max_s = 10#12 # 17
+min_s = 4#6
 
 def genTriData(num_tri, step_size):
     '''

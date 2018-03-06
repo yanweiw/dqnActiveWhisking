@@ -7,7 +7,7 @@ import dqnEnv as de
 import dqnAgent as da
 import numpy as np
 
-episodes = 5000
+episodes = 20000
 N_episodes = 50
 max_exploration = 20
 

@@ -1,5 +1,7 @@
 # The beautiful demos of learned agents hide all the blood, sweat, and tears that go into creating them.
 
+![1](images/dqn_somewhat_converging.png)
+
 ![1](images/learn_to_stay.png)
 
 ![1](images/explore1.png)

@@ -20,7 +20,7 @@ class dqnEnv:
         self.min_s = sim.min_s
         self.agentX = 10#np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
         self.agentY = 10#np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
-        self.agentZ = 5#np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
+        self.agentZ = 8#np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
         self.shape = np.random.choice([0, 1])
         self.shapeX = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
         self.shapeY = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
@@ -41,7 +41,7 @@ class dqnEnv:
         '''
         self.agentX = 10#np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
         self.agentY = 10#np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
-        self.agentZ = 5#np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
+        self.agentZ = 8#np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
         self.shape = np.random.choice([0, 1])
         self.shapeX = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
         self.shapeY = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
