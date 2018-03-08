@@ -28,7 +28,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']
 print(model.summary())
 
 print('Fitting...')
-model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=3, batch_size=64)
+model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=15, batch_size=64)
 
 print('Building another stateful model of batch_size = 1...')
 model2 = Sequential()

@@ -13,12 +13,13 @@ class dqnAgent:
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=3000)
-        self.gamma = 0.95  # discount rate
+        self.gamma = 0.9  # discount rate
         self.epsilon = 1.0 # exploration rate
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
         self.learning_rate = 0.00025
         self.model = self._build_model()
+
 
     def _build_model(self):
         '''
@@ -32,14 +33,17 @@ class dqnAgent:
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
         return model
 
+
     def remember(self, state, action, reward, next_state, terminal):
         self.memory.append((state, action, reward, next_state, terminal))
+
 
     def act(self, state):
         if np.random.rand() <= self.epsilon:
             return random.randrange(self.action_size)
         act_values = self.model.predict(state)
         return np.argmax(act_values[0])
+
 
     def replay(self, batch_size):
         minibatch = random.sample(self.memory, batch_size)

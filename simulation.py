@@ -9,15 +9,15 @@ import math
 
 root3 = np.sqrt(3)
 # positions of head
-max_width = 16 # 21
-min_width = 5 # 0
-max_depth = 9 # 11
+min_width = 0#5   # these values are NOT inclusive
+max_width = 21#16 # use smaller region for LSTM training, and whole region for DQN training
 min_depth = 1
+max_depth = 11 # At the initial height 8, whiskers cover the entire 0 * 20 space
 # positions of shape
-max_x = 16#13 # 16
-min_x = 5#8 # 5
-max_s = 10#12 # 17
-min_s = 4#6
+min_x = 8
+max_x = 13
+min_s = 4
+max_s = 9
 
 def genTriData(num_tri, step_size):
     '''
@@ -41,7 +41,7 @@ def genTriData(num_tri, step_size):
         j = np.random.randint(0, step_size, dtype=np.uint8)
         X = x
         Y = y
-        Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
+        Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
         t_config[i, j, 5:8] = X, Y, Z
         tri_data[i, j] = getDist(t_config[i, j])
     np.save('data/tri_data_%d' % num_tri, tri_data)
@@ -63,15 +63,15 @@ def genHexData(num_hex, step_size):
         s = np.random.uniform(min_s, max_s)
         h_config[i, :, 1:5] = x, y, t, s
         for j in range(0, step_size):
-            X = np.random.randint(0, max_width, dtype=np.uint8)
-            Y = np.random.randint(0, max_width, dtype=np.uint8)
+            X = np.random.randint(min_width, max_width, dtype=np.uint8)
+            Y = np.random.randint(min_width, max_width, dtype=np.uint8)
             Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
             h_config[i, j, 5:8] = X, Y, Z
             hex_data[i, j] = getDist(h_config[i, j])
         j = np.random.randint(0, step_size, dtype=np.uint8)
         X = x + s / 2.0
         Y = y
-        Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
+        Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
         h_config[i, j, 5:8] = X, Y, Z
         hex_data[i, j] = getDist(h_config[i, j])
     np.save('data/hex_data_%d' % num_hex, hex_data)
@@ -130,7 +130,7 @@ def getDist(config, draw=False):
     Return an array of 19 L2 distances between the root of whisker 0 - 18 and the x-y plane at Z = 0.
     Whisker 0 is center whisker. Whisker 1 - 6 starts at (1, 0) counterclockwise in the inner circle.
     Whisker 7 - 18 starts at (1.732, 0) counterclockwise in the outercircle. The outer circle twice as
-    dense as inner circle. If laser lands outside of the shape, returned length is 0.
+    dense as inner circle. If laser lands outside of the shape, returned length is 255.
     '''
     label, x, y, t, s, X, Y, Z = config
     # distance from head to contact regardless if within shape
@@ -140,7 +140,7 @@ def getDist(config, draw=False):
     # draw and return measured distances
     if draw:
         drawObserv(on_shape, bound_vec, cont_pos, x, y)
-    return on_shape * head_to_cont + ~on_shape * 0
+    return on_shape * head_to_cont + ~on_shape * 255
 
 
 def getContactPos(X, Y, Z):

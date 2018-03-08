@@ -7,7 +7,7 @@ import dqnEnv as de
 import dqnAgent as da
 import numpy as np
 
-episodes = 20000
+episodes = 10000
 N_episodes = 50
 max_exploration = 20
 
@@ -16,37 +16,32 @@ env = de.dqnEnv('models/lstm_tri_hex.h5')
 agent = da.dqnAgent(95, 7)
 
 # Iterate episods
-ob = np.zeros((50, max_exploration, 8))
-rw = np.zeros((50, max_exploration, 1))
-for e in range(1, episodes+1):
+# ob = np.zeros((50, max_exploration, 8))
+# rw = np.zeros((50, max_exploration, 1))
+for e in range(1, episodes+1):  # the first entry in N_episodes
     if e % N_episodes == 1:
         ob = np.zeros((50, max_exploration, 8))
         rw = np.zeros((50, max_exploration, 1))
-    # reset state to start with
-    curr_state = env.reset()
-    curr_state = np.asarray(curr_state).reshape(1, 95) # convert deque to nparray
-    if e % N_episodes == 1:   # the first entry in N_episodes
-        score = 0
+        score = 0.0
         steps = 0.0
+    # reset state to start with
+    env.reset()
     # begin time sequence
     for t in range(1, max_exploration+1):
+        curr_state = np.asarray(env.state).reshape(1, 95) # convert deque to nparray
         action = agent.act(curr_state)
-        reward, next_state, terminal = env.step(action)
+        reward, terminal = env.step(action)
         ob[(e - 1) % 50, t - 1, :] = env.shape, env.shapeX, env.shapeY, env.shapeT, env.shapeS, env.agentX, env.agentY, env.agentZ
         rw[(e - 1) % 50, t - 1] = reward
-        next_state = np.asarray(next_state).reshape(1, 95) # convert deque to nparray
-        # terminal = False
+        next_state = np.asarray(env.state).reshape(1, 95) # convert deque to nparray
         if t == max_exploration:
             terminal = True
         # remember the transition
         agent.remember(curr_state, action, reward, next_state, terminal)
-
-        # advance state, total Qvalue as score
-        curr_state = next_state
-
+        # total Qvalue as score
         if terminal:
             score += env.qValue
-            steps += t
+            steps += t  # this is why t starts at 1 rather than 0
             if e % N_episodes == 0:
                 print('episodes: {}/{}, score: {}, steps: {}'.format(e, episodes, \
                                                                 score / N_episodes, steps / N_episodes))
