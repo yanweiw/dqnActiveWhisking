@@ -96,6 +96,10 @@ class dqnEnv:
         4: agentY--
         5: agentZ++
         6: agentZ--
+        7: agentZ--, agentX++
+        8: agentZ--, agentY++
+        9: agentZ--, agentX--
+        10:agentZ--, agentY--
         '''
         if (action == 1) and (self.agentX + 1 < self.max_width):
             self.agentX += 1
@@ -109,6 +113,18 @@ class dqnEnv:
             self.agentZ += 1
         elif (action == 6) and (self.agentZ - 1 >= self.min_depth):
             self.agentZ -= 1
+        elif (action == 7) and (self.agentZ - 1 >= self.min_depth) and (self.agentX + 1 < self.max_width):
+            self.agentZ -= 1
+            self.agentX += 1
+        elif (action == 8) and (self.agentZ - 1 >= self.min_depth) and (self.agentY + 1 < self.max_width):
+            self.agentZ -= 1
+            self.agentY += 1
+        elif (action == 9) and (self.agentZ - 1 >= self.min_depth) and (self.agentX - 1 >= self.min_width):
+            self.agentZ -= 1
+            self.agentX -= 1
+        elif (action == 10) and (self.agentZ - 1 >= self.min_depth) and (self.agentY - 1 >= self.min_width):
+            self.agentZ -= 1
+            self.agentY -= 1
         else:
             action = 0 # corresponding to action == 0
         return action
