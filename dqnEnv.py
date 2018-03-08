@@ -78,7 +78,11 @@ class dqnEnv:
         reward = - 1
         # if action == 0:
             # reward = -1 # discourage stay action
-        if loss < 0.10:
+        if loss < 0.7:
+            reward = 0
+        if np.all((observation==0), axis=1)[0] or np.all((observation==255), axis=1)[0]:
+            reward = -2
+        if loss < 0.20:
             terminal = True
             reward = 10.0
         self.qValue += reward
