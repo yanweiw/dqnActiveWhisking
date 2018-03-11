@@ -12,7 +12,7 @@ N_episodes = 50
 max_exploration = 20
 
 # initialize environment and the agent
-env = de.dqnEnv('models/lstm_tri_hex.h5')
+env = de.dqnEnv('models/dnn_tri_hex.h5')
 agent = da.dqnAgent(95, 11)
 
 # Iterate episods

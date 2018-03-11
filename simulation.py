@@ -9,10 +9,10 @@ import math
 
 root3 = np.sqrt(3)
 # positions of head
-min_width = 5#0#5   # these values are NOT inclusive
-max_width = 15#21#16 # use smaller region for LSTM training, and whole region for DQN training
+min_width = 0#5#0#5   # these values are NOT inclusive
+max_width = 21#15#21#16 # use smaller region for LSTM training, and whole region for DQN training
 min_depth = 1
-max_depth = 8#11 # At the initial height 8, whiskers cover the entire 0 * 20 space
+max_depth = 11#8#11 # At the initial height 8, whiskers cover the entire 0 * 20 space
 # positions of shape
 min_x = 8
 max_x = 12#13

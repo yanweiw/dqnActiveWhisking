@@ -8,7 +8,7 @@ import simulation as sim
 
 
 class dqnEnv:
-    def __init__(self, rnnpath='models/lstm_tri_hex.h5'):
+    def __init__(self, dnnpath='models/dnn_tri_hex.h5'):
         self.min_width = sim.min_width     # head x ~ (0, 21)
         self.max_width = sim.max_width
         self.min_depth = sim.min_depth     # z ~ (1, 11)
@@ -22,13 +22,13 @@ class dqnEnv:
         self.agentY = 10#np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
         self.agentZ = 8#np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
         self.shape = np.random.choice([0, 1]) # whether tri or hex
-        self.shapeX = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
-        self.shapeY = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
+        self.shapeX = np.random.uniform(self.min_shape_pos, self.max_shape_pos)
+        self.shapeY = np.random.uniform(self.min_shape_pos, self.max_shape_pos)
         self.shapeT = np.random.uniform(0, 2 * np.pi)
         self.shapeS = np.random.uniform(self.min_s, self.max_s)
         self.qValue = 0 # initial prediction of accumulated rewards, as future rewards are negative
-        self.rnn = load_model(rnnpath)
-        self.rnn.reset_states()
+        self.dnn = load_model(dnnpath)
+        # self.rnn.reset_states()   # dnn needs not to be reset
         self.state = deque(maxlen=5) # state is a deque of past five observations (numpy array of 1, 19)
         for i in range(5):
             self.state.append(np.zeros((1, 19)))
@@ -37,17 +37,17 @@ class dqnEnv:
     def reset(self):
         '''
         Function to restart another sequence of simulations
-        Return the first state produced by first observation after reset the stateful rnn
+        Return the first state produced by first observation after reset the stateful dnn
         '''
         self.agentX = 10#np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
         self.agentY = 10#np.random.randint(self.min_width, self.max_width, dtype=np.uint8)
         self.agentZ = 8#np.random.randint(self.min_depth, self.max_depth, dtype=np.uint8)
         self.shape = np.random.choice([0, 1])
-        self.shapeX = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
-        self.shapeY = np.random.randint(self.min_shape_pos, self.max_shape_pos, dtype=np.uint8)
+        self.shapeX = np.random.uniform(self.min_shape_pos, self.max_shape_pos)
+        self.shapeY = np.random.uniform(self.min_shape_pos, self.max_shape_pos)
         self.shapeT = np.random.uniform(0, 2 * np.pi)
         self.shapeS = np.random.uniform(self.min_s, self.max_s)
-        self.rnn.reset_states()
+        # self.rnn.reset_states()
         for i in range(5):
             self.state.append(np.zeros((1, 19)))
         # Fist observation in the sequence corresponding to a "stay action"
@@ -69,22 +69,27 @@ class dqnEnv:
         if not self.shape:
             label = np.ones((1,1))
         # evaluate loss as reward
-        loss = self.rnn.evaluate(observation.reshape(1, 1, 19), label, batch_size=1, verbose=0)[0]
-        # new_state = K.get_value(self.rnn.layers[0].states[1]) # (1, 100) np array
+        # loss = self.rnn.evaluate(observation.reshape(1, 19), label, batch_size=1, verbose=0)[0]
+        loss = self.dnn.evaluate(observation, label, verbose=0)[0]
+        # new_state = K.get_value(self.dnn.layers[0].states[1]) # (1, 100) np array
         # update reward and state
         self.state.append(observation)
         # self.state = new_state
         terminal = False
-        reward = - 1
+        reward = - loss
         # if action == 0:
             # reward = -1 # discourage stay action
-        if loss < 0.7:
-            reward = 0
         if np.all((observation==0), axis=1)[0] or np.all((observation==255), axis=1)[0]:
-            reward = -2
-        if loss < 0.20:
+            reward -= 0.5
+        total_ob = np.sum(observation)
+        if total_ob < 510 or total_ob > 4590:  # fewer than two whiskers (255 * 2) on shape or (255 * 18) off shape
+            reward -= 0.5                         # assuming loss for these cases are larger than 0.1
+        if loss < 0.1:
             terminal = True
             reward = 10.0
+        if loss < 0.01:
+            terminal = True
+            reward = 20.0
         self.qValue += reward
         return reward, terminal
 
