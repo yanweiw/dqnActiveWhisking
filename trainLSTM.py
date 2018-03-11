@@ -75,7 +75,7 @@ model3.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'
 print(model3.summary())
 
 print('Fitting...')
-model3.fit(x_train_flat, y_train_flat, validation_data=(x_test_flat, y_test_flat), epochs=4, batch_size=64)
+model3.fit(x_train_flat, y_train_flat, validation_data=(x_test_flat, y_test_flat), epochs=5, batch_size=64)
 
 print('Evaluating...')
 for i in range(0, 6):

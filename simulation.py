@@ -51,7 +51,7 @@ def genData(num, shape, step_size):
             X = x
         Y = y
         # Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
-        Z = np.random.uniform(min_depth, min_depth + 5)
+        Z = np.random.uniform(min_depth, s / 2.0)
         config[i, j, 5:8] = X, Y, Z
         observation[i, j] = getDist(config[i, j])
     if not shape:
@@ -202,9 +202,9 @@ def within_tri(A, b):
     return True if point b is within the triangle spanned by the two column vectors of A
     '''
     on_shape = np.linalg.solve(A, b)
-    mask1 = np.all((on_shape > - 0.05), axis=0, keepdims=True) # prevent rounding issue and add noise
-    mask2 = np.all((on_shape < 1.05), axis=0, keepdims=True)
-    mask3 = np.sum(on_shape, axis=0, keepdims=True) < 1.05
+    mask1 = np.all((on_shape > - 0.02), axis=0, keepdims=True) # prevent rounding issue and add noise
+    mask2 = np.all((on_shape < 1.02), axis=0, keepdims=True)
+    mask3 = np.sum(on_shape, axis=0, keepdims=True) < 1.02
     return np.all(np.vstack((mask1, mask2, mask3)), axis=0, keepdims=True)
 
 
