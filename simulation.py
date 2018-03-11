@@ -9,74 +9,88 @@ import math
 
 root3 = np.sqrt(3)
 # positions of head
-min_width = 0#5   # these values are NOT inclusive
-max_width = 21#16 # use smaller region for LSTM training, and whole region for DQN training
+min_width = 5#0#5   # these values are NOT inclusive
+max_width = 15#21#16 # use smaller region for LSTM training, and whole region for DQN training
 min_depth = 1
-max_depth = 11 # At the initial height 8, whiskers cover the entire 0 * 20 space
+max_depth = 8#11 # At the initial height 8, whiskers cover the entire 0 * 20 space
 # positions of shape
 min_x = 8
-max_x = 13
-min_s = 4
-max_s = 9
+max_x = 12#13
+min_s = 3
+max_s = 12#9
 
-def genTriData(num_tri, step_size):
+def genData(num, shape, step_size):
     '''
-    Generate dataset of a num_tri of triangles
-    The data for each is num_tri samples * step_size * 19 whisker distances
+    Generate dataset of a num of triangles (shape=0) or hexagons (shape=1)
+    The data for each is num samples * step_size * 19 whisker distances
     '''
-    tri_data = np.zeros((num_tri, step_size, 19))
-    t_config = np.zeros((num_tri, step_size, 8))
-    for i in range(0, num_tri):
-        x = np.random.randint(min_x, max_x, dtype=np.uint8)
-        y = np.random.randint(min_x, max_x, dtype=np.uint8)
+    observation = np.zeros((num, step_size, 19))
+    config = np.ones((num, step_size, 8))
+    if shape == 0:
+        config *= 0
+    for i in range(0, num):
+        # x = np.random.randint(min_x, max_x, dtype=np.uint8)
+        x = np.random.uniform(min_x, max_x)
+        # y = np.random.randint(min_x, max_x, dtype=np.uint8)
+        y = np.random.uniform(min_x, max_x)
         t = np.random.uniform(0, 2 * np.pi)
         s = np.random.uniform(min_s, max_s)
-        t_config[i, :, 1:5] = x, y, t, s
+        config[i, :, 1:5] = x, y, t, s
         for j in range(0, step_size):
-            X = np.random.randint(min_width, max_width, dtype=np.uint8)
-            Y = np.random.randint(min_width, max_width, dtype=np.uint8)
-            Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
-            t_config[i, j, 5:8] = X, Y, Z
-            tri_data[i, j] = getDist(t_config[i, j])
-        j = np.random.randint(0, step_size, dtype=np.uint8)
-        X = x
-        Y = y
-        Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
-        t_config[i, j, 5:8] = X, Y, Z
-        tri_data[i, j] = getDist(t_config[i, j])
-    np.save('data/tri_data_%d' % num_tri, tri_data)
-    np.save('data/t_config_%d' % num_tri, t_config)
-    return tri_data, t_config
-
-
-def genHexData(num_hex, step_size):
-    '''
-    Generate dataset of a num_hex of hexagons
-    The data for each is num_hex samples * step_size * 19 whisker distances
-    '''
-    hex_data = np.zeros((num_hex, step_size, 19))
-    h_config = np.ones((num_hex, step_size, 8))
-    for i in range(0, num_hex):
-        x = np.random.randint(min_x, max_x, dtype=np.uint8)
-        y = np.random.randint(min_x, max_x, dtype=np.uint8)
-        t = np.random.uniform(0, 2 * np.pi)
-        s = np.random.uniform(min_s, max_s)
-        h_config[i, :, 1:5] = x, y, t, s
-        for j in range(0, step_size):
-            X = np.random.randint(min_width, max_width, dtype=np.uint8)
-            Y = np.random.randint(min_width, max_width, dtype=np.uint8)
-            Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
-            h_config[i, j, 5:8] = X, Y, Z
-            hex_data[i, j] = getDist(h_config[i, j])
+            # X = np.random.randint(min_width, max_width, dtype=np.uint8)
+            X = np.random.uniform(min_width, max_width)
+            # Y = np.random.randint(min_width, max_width, dtype=np.uint8)
+            Y = np.random.uniform(min_width, max_width)
+            # Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
+            Z = np.random.uniform(min_depth, max_depth)
+            config[i, j, 5:8] = X, Y, Z
+            observation[i, j] = getDist(config[i, j])
         j = np.random.randint(0, step_size, dtype=np.uint8)
         X = x + s / 2.0
+        if not shape:
+            X = x
         Y = y
-        Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
-        h_config[i, j, 5:8] = X, Y, Z
-        hex_data[i, j] = getDist(h_config[i, j])
-    np.save('data/hex_data_%d' % num_hex, hex_data)
-    np.save('data/h_config_%d' % num_hex, h_config)
-    return hex_data, h_config
+        # Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
+        Z = np.random.uniform(min_depth, min_depth + 5)
+        config[i, j, 5:8] = X, Y, Z
+        observation[i, j] = getDist(config[i, j])
+    if not shape:
+        np.save('data/tri_data_%d' % num, observation)
+        np.save('data/t_config_%d' % num, config)
+    else:
+        np.save('data/hex_data_%d' % num, observation)
+        np.save('data/h_config_%d' % num, config)
+    return observation, config
+
+
+# def genHexData(num_hex, step_size):
+#     '''
+#     Generate dataset of a num_hex of hexagons
+#     The data for each is num_hex samples * step_size * 19 whisker distances
+#     '''
+#     hex_data = np.zeros((num_hex, step_size, 19))
+#     h_config = np.ones((num_hex, step_size, 8))
+#     for i in range(0, num_hex):
+#         # x = np.random.randint(min_x, max_x, dtype=np.uint8)
+#         # y = np.random.randint(min_x, max_x, dtype=np.uint8)
+#         t = np.random.uniform(0, 2 * np.pi)
+#         s = np.random.uniform(min_s, max_s)
+#         h_config[i, :, 1:5] = x, y, t, s
+#         for j in range(0, step_size):
+#             # X = np.random.randint(min_width, max_width, dtype=np.uint8)
+#             # Y = np.random.randint(min_width, max_width, dtype=np.uint8)
+#             # Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
+#             h_config[i, j, 5:8] = X, Y, Z
+#             hex_data[i, j] = getDist(h_config[i, j])
+#         j = np.random.randint(0, step_size, dtype=np.uint8)
+#         X = x + s / 2.0
+#         Y = y
+#         # Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
+#         h_config[i, j, 5:8] = X, Y, Z
+#         hex_data[i, j] = getDist(h_config[i, j])
+#     np.save('data/hex_data_%d' % num_hex, hex_data)
+#     np.save('data/h_config_%d' % num_hex, h_config)
+#     return hex_data, h_config
 
 
 def decodeData(config, i, k):
@@ -188,9 +202,9 @@ def within_tri(A, b):
     return True if point b is within the triangle spanned by the two column vectors of A
     '''
     on_shape = np.linalg.solve(A, b)
-    mask1 = np.all((on_shape > - 0.000001), axis=0, keepdims=True) # prevent rounding issue
-    mask2 = np.all((on_shape < 1.000001), axis=0, keepdims=True)
-    mask3 = np.sum(on_shape, axis=0, keepdims=True) < 1.000001
+    mask1 = np.all((on_shape > - 0.05), axis=0, keepdims=True) # prevent rounding issue and add noise
+    mask2 = np.all((on_shape < 1.05), axis=0, keepdims=True)
+    mask3 = np.sum(on_shape, axis=0, keepdims=True) < 1.05
     return np.all(np.vstack((mask1, mask2, mask3)), axis=0, keepdims=True)
 
 
@@ -211,10 +225,11 @@ def main():
     Main function to generate datasets
     '''
     num = int(sys.argv[1])
+    time_step = int(sys.argv[2])
     print("Generating %d triangle data points..." % num)
-    genTriData(num)
+    genData(num, 0, time_step)
     print("Generating %d hexagon points..." % num)
-    genHexData(num)
+    genData(num, 1,time_step)
 
 
 if __name__ == '__main__':
