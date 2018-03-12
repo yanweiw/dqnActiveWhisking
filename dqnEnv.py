@@ -64,7 +64,7 @@ class dqnEnv:
         action = self.updateAgentPos(action) # modify action if agent doesn't move due to bounds
         config = [self.shape, self.shapeX, self.shapeY, self.shapeT, self.shapeS, \
                                     self.agentX, self.agentY, self.agentZ]
-        observation = sim.getDist(config) # (1, 19) np.array
+        observation, categories = sim.getDist(config) # (1, 19) np.array observation
         label = np.zeros((1,1))
         if not self.shape:
             label = np.ones((1,1))
@@ -75,21 +75,28 @@ class dqnEnv:
         # update reward and state
         self.state.append(observation)
         # self.state = new_state
+
+        cate_prob = (categories + 0.01) / 19.04 # avoid 0s and thus NaN
+        # calc Shannon entropy
+        entropy = -np.sum(cate_prob * np.log2(cate_prob))
+        # use agentZ as weight
+        weight = 2.0 / self.agentZ
+
         terminal = False
-        reward = - loss
+        reward = weight * entropy - 1 
         # if action == 0:
             # reward = -1 # discourage stay action
-        if np.all((observation==0), axis=1)[0] or np.all((observation==255), axis=1)[0]:
-            reward -= 0.5
-        total_ob = np.sum(observation)
-        if total_ob < 510 or total_ob > 4590:  # fewer than two whiskers (255 * 2) on shape or (255 * 18) off shape
-            reward -= 0.5                         # assuming loss for these cases are larger than 0.1
-        if loss < 0.1:
+        # if np.all((observation==0), axis=1)[0] or np.all((observation==255), axis=1)[0]:
+            # reward -= 0.5
+        # total_ob = np.sum(observation)
+        # if total_ob < 510 or total_ob > 4590:  # fewer than two whiskers (255 * 2) on shape or (255 * 18) off shape
+            # reward -= 0.5                         # assuming loss for these cases are larger than 0.1
+        if loss < 0.2:
             terminal = True
-            reward = 10.0
-        if loss < 0.01:
-            terminal = True
-            reward = 20.0
+            reward = 30
+        # if loss < 0.01:
+            # terminal = True
+            # reward = 10.0
         self.qValue += reward
         return reward, terminal
 

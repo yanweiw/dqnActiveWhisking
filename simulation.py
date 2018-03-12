@@ -44,7 +44,7 @@ def genData(num, shape, step_size):
             # Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
             Z = np.random.uniform(min_depth, max_depth)
             config[i, j, 5:8] = X, Y, Z
-            observation[i, j] = getDist(config[i, j])
+            observation[i, j], _ = getDist(config[i, j])
         j = np.random.randint(0, step_size, dtype=np.uint8)
         X = x + s / 2.0
         if not shape:
@@ -53,7 +53,7 @@ def genData(num, shape, step_size):
         # Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
         Z = np.random.uniform(min_depth, s / 2.0)
         config[i, j, 5:8] = X, Y, Z
-        observation[i, j] = getDist(config[i, j])
+        observation[i, j], _ = getDist(config[i, j])
     if not shape:
         np.save('data/tri_data_%d' % num, observation)
         np.save('data/t_config_%d' % num, config)
@@ -81,13 +81,13 @@ def genData(num, shape, step_size):
 #             # Y = np.random.randint(min_width, max_width, dtype=np.uint8)
 #             # Z = np.random.randint(min_depth, max_depth, dtype=np.uint8)
 #             h_config[i, j, 5:8] = X, Y, Z
-#             hex_data[i, j] = getDist(h_config[i, j])
+#             hex_data[i, j], _ = getDist(h_config[i, j])
 #         j = np.random.randint(0, step_size, dtype=np.uint8)
 #         X = x + s / 2.0
 #         Y = y
 #         # Z = np.random.randint(min_depth, min_depth + 3, dtype=np.uint8)
 #         h_config[i, j, 5:8] = X, Y, Z
-#         hex_data[i, j] = getDist(h_config[i, j])
+#         hex_data[i, j], _ = getDist(h_config[i, j])
 #     np.save('data/hex_data_%d' % num_hex, hex_data)
 #     np.save('data/h_config_%d' % num_hex, h_config)
 #     return hex_data, h_config
@@ -154,7 +154,15 @@ def getDist(config, draw=False):
     # draw and return measured distances
     if draw:
         drawObserv(on_shape, bound_vec, cont_pos, x, y)
-    return on_shape * head_to_cont + ~on_shape * 255
+    distances = on_shape * head_to_cont + ~on_shape * 255
+    # count population to calculate Shannon entropy
+    population = on_shape * 1
+    categories = np.zeros((1,4))
+    categories[0,0] = population[0, 0]
+    categories[0,1] = population[0, 1:7].sum()
+    categories[0,2] = population[0, 7:19].sum()
+    categories[0,3] = 19 - population.sum() 
+    return distances, categories
 
 
 def getContactPos(X, Y, Z):
