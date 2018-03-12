@@ -83,7 +83,7 @@ class dqnEnv:
         weight = 2.0 / self.agentZ
 
         terminal = False
-        reward = weight * entropy - loss
+        reward = weight * entropy
         # if action == 0:
             # reward = -1 # discourage stay action
         # if np.all((observation==0), axis=1)[0] or np.all((observation==255), axis=1)[0]:
