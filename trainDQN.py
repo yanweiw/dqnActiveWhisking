@@ -22,6 +22,7 @@ for e in range(1, episodes+1):  # the first entry in N_episodes
     if e % N_episodes == 1:
         ob = np.zeros((50, max_exploration, 8))
         rw = np.zeros((50, max_exploration, 1))
+        ls = np.zeros((50, max_exploration, 1))
         score = 0.0
         steps = 0.0
     # reset state to start with
@@ -30,9 +31,10 @@ for e in range(1, episodes+1):  # the first entry in N_episodes
     for t in range(1, max_exploration+1):
         curr_state = np.asarray(env.state).reshape(1, 95) # convert deque to nparray
         action = agent.act(curr_state)
-        reward, terminal = env.step(action)
+        reward, terminal, loss = env.step(action)
         ob[(e - 1) % 50, t - 1, :] = env.shape, env.shapeX, env.shapeY, env.shapeT, env.shapeS, env.agentX, env.agentY, env.agentZ
         rw[(e - 1) % 50, t - 1] = reward
+        ls[(e - 1) % 50, t - 1] = loss
         next_state = np.asarray(env.state).reshape(1, 95) # convert deque to nparray
         if t == max_exploration:
             terminal = True
@@ -47,6 +49,7 @@ for e in range(1, episodes+1):  # the first entry in N_episodes
                                                                 score / N_episodes, steps / N_episodes))
                 np.save('data/agent_observation', ob)
                 np.save('data/agent_reward', rw)
+                np.save('data/agent_loss', ls)
             break
 
     # train dqn with gradient descent on past experience
