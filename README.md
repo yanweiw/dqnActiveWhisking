@@ -1,3 +1,67 @@
+# My battle with SNEAKY bugs!
+
+### Retrained DNN on single observation
+
+![](images/modified_reward_training.png)
+
+![](images/modified_reward1.png)
+
+![](images/modified_reward2.png)
+
+![](images/modified_reward3.png)
+
+![](images/modified_reward4.png)
+
+![](images/modified_reward5.png)
+
+![](images/modified_reward6.png)
+
+![](images/modified_reward7.png)
+
+![](images/modified_reward8.png)
+
+Caveat: Overfitting
+
+![](images/reward_loss.png)
+
+![](images/overfitting1.png)
+
+### Shannon Entropy
+
+![](images/converged_shannon1.png)
+
+![](images/converged_shannon2.png)
+
+![](images/converged_shannon3.png)
+
+![](images/converged_shannon4.png)
+
+![](images/converged_shannon5.png)
+
+![](images/converged_shannon6.png)
+
+![](images/converged_shannon7.png)
+
+![](images/shannon_result1.png)
+
+Outlier:
+
+![](images/outlier1.png)
+
+![](images/outlier2.png)
+
+![](images/outlier3.png)
+
+![](images/outlier4.png)
+
+![](images/shannon_result2.png)
+
+
+
+
+
+
+
 # The beautiful demos of learned agents hide all the blood, sweat, and tears that go into creating them.
 
 ![1](images/dqn_somewhat_converging.png)
@@ -15,12 +79,6 @@
 ![1](images/test2.png)
 
 ![1](images/test3.png)
-
-
-
-
-
-
 
 ### 1. The data is too sparse
 

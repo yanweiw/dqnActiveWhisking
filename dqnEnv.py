@@ -80,10 +80,10 @@ class dqnEnv:
         # calc Shannon entropy
         entropy = -np.sum(cate_prob * np.log2(cate_prob))
         # use agentZ as weight
-        weight = 2.0 / self.agentZ
+        weight = (11 - self.agentZ) / 5.0
 
         terminal = False
-        reward = weight * entropy
+        reward = weight * entropy - 1
         # if action == 0:
             # reward = -1 # discourage stay action
         # if np.all((observation==0), axis=1)[0] or np.all((observation==255), axis=1)[0]:
