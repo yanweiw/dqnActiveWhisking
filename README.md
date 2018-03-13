@@ -1,4 +1,28 @@
-# My battle with SNEAKY bugs!
+# DQN for active whisking
+
+In a 2017 NIPS paper [Toward Goal-Driven Neural Network Models for the Rodent Whisker-Trigeminal System](https://arxiv.org/abs/1706.07555), several deep neural networks that input whisker array information such as bending and twisting are trained for shape detection.The best top-5 accuracy is 44.8%, while chance is 0.85%. One potential improvement on this performance is active sensing, as the current sensing data are obtained from passive sweeping the whisker array against objects. Incorporating active whiskering based on past sensing signals reflects how rats behave in real world and can potentially improve the efficiency and accuracy of shape detection.
+
+### Model Abstraction
+
+The goal is to learn an optimal controller for a whisker array in space around an object to collect observations in order to sequentially improve the estimation of the object shape in an efficient manner. As a starter, I have simplified the problem to a 2d classification of triangles and hexagons and also the whisker array to a radially outward positioned laser array. The idea is that rats can figure out the distance between contact points and their corresponding whisker base from whisker signals. So we are using Euclidean distances as classification input.
+
+### DQN Algorithm
+
+![DQN Algorithm](images/dqnAlgorithm.png)
+
+### Results
+
+On average the whisker array is able to move to most differentiating regions and collect observation that gives rise to a 90% confident classification within 10 steps.
+
+![](images/hex_6step.png)
+![](images/tri_6step.png)
+
+## More details to come!
+
+
+
+
+<!-- # My battle with SNEAKY bugs!
 
 ### Retrained DNN on single observation
 
@@ -130,4 +154,4 @@ Outlier:
 ![14](images/hex_102_1.png)
 
 ![15](images/hex_102_2.png)
-<!-- ![5](images/tri_5.png) -->
+<!-- ![5](images/tri_5.png) --> 
