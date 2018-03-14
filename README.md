@@ -19,6 +19,8 @@ On average the whisker array is able to move to most differentiating regions and
 
 ## More details to come!
 
+For more information, you can find me at my [portfolio page](https://yanweiw.github.io/).
+
 
 
 
@@ -154,4 +156,4 @@ Outlier:
 ![14](images/hex_102_1.png)
 
 ![15](images/hex_102_2.png)
-<!-- ![5](images/tri_5.png) --> 
+<!-- ![5](images/tri_5.png) -->
