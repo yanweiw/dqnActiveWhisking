@@ -20,6 +20,7 @@ On average the whisker array is able to move to most differentiating regions and
 ## More details to come!
 
 For more information, you can find me at my [portfolio page](https://yanweiw.github.io/).
+Cover photo credit to [SeNSE Lab](http://journals.plos.org/ploscompbiol/issue?id=10.1371/issue.pcbi.v07.i04).
 
 
 
