@@ -12,7 +12,7 @@ class dqnAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
-        self.memory = deque(maxlen=3000)
+        # self.memory = deque(maxlen=3000)
         self.gamma = 0.9  # discount rate
         self.epsilon = 1.0 # exploration rate
         self.epsilon_min = 0.01
@@ -34,8 +34,8 @@ class dqnAgent:
         return model
 
 
-    def remember(self, state, action, reward, next_state, terminal):
-        self.memory.append((state, action, reward, next_state, terminal))
+    # def remember(self, state, action, reward, next_state, terminal):
+        # self.memory.append((state, action, reward, next_state, terminal))
 
 
     def act(self, state):
@@ -45,14 +45,14 @@ class dqnAgent:
         return np.argmax(act_values[0])
 
 
-    def replay(self, batch_size):
-        minibatch = random.sample(self.memory, batch_size)
-        for state, action, reward, next_state, terminal in minibatch:
-            target = reward # for terminal state
-            if not terminal:
-                target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
-            target_f = self.model.predict(state)
-            target_f[0][action] = target
-            self.model.fit(state, target_f, epochs=1, verbose=0)
-        if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
+    # def replay(self, batch_size):
+    #     minibatch = random.sample(self.memory, batch_size)
+    #     for state, action, reward, next_state, terminal in minibatch:
+    #         target = reward # for terminal state
+    #         if not terminal:
+    #             target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
+    #         target_f = self.model.predict(state)
+    #         target_f[0][action] = target
+    #         self.model.fit(state, target_f, epochs=1, verbose=0)
+    #     if self.epsilon > self.epsilon_min:
+    #         self.epsilon *= self.epsilon_decay
