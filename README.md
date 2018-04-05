@@ -6,6 +6,8 @@ In a 2017 NIPS paper [Toward Goal-Driven Neural Network Models for the Rodent Wh
 
 The goal is to learn an optimal controller for a whisker array in space around an object to collect observations in order to sequentially improve the estimation of the object shape in an efficient manner. As a starter, I have simplified the problem to a 2d classification of triangles and hexagons and also the whisker array to a radially outward positioned laser array. The idea is that rats can figure out the distance between contact points and their corresponding whisker base from whisker signals. So we are using Euclidean distances as classification input.
 
+![Laser Array](images/laser_array.png)
+
 ### DQN Algorithm
 
 ![DQN Algorithm](images/dqnAlgorithm.png)
