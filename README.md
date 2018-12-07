@@ -18,8 +18,10 @@ The goal is to learn an optimal controller for a whisker array in space around a
 
 On average the whisker array is able to move to most differentiating regions and collect observation that gives rise to a 90% confident classification within 10 steps.
 
-![](images/hex_6step.png)
-![](images/tri_6step.png)
+<!-- ![](images/hex_6step.png)
+![](images/tri_6step.png) -->
+<img src="images/hex_6step.png" alt="se2" style="width:600px;height:300px;">
+<img src="images/tri_6step.png" alt="se2" style="width:600px;height:300px;">
 
 Detailed and updated description of my current results can be found in this [project report](dqn_active_whisking.pdf).
 
