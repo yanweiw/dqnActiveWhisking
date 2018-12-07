@@ -28,16 +28,19 @@ Detailed and updated description of my current results can be found in this [pro
 One undesirable trait of the above work is reward shaping. Ideally, we would want the dqn agent to discover a policy that chases information rather than implicitly instruct it to do so. This motivates us to have a better representation of the state and by doing so the same algorithm can learn to collect information aggressively without reward shaping in the following shape estimation task.
 
 <!-- ![](images/se2.gif) -->
-<img src="images/se2.gif" alt="se2" style="width:300px;height:100px;">
-<img src="images/se3.gif" alt="se3" style="width:300px;height:100px;">
+<img src="images/se2.gif" alt="se2" style="width:900px;height:300px;">
+<img src="images/se3.gif" alt="se3" style="width:900px;height:300px;">
+
+
+By passive sensing, that is randomly querying the environment, an agent will need on average 15 / 36 attempts to estimate the shape accurately, while active choosing what to query allows an average 8 attempts to achieve the same accuracy.
+
+![](images/se_train.png)
 
 
 For more information, you can find me at my [portfolio page](https://yanweiw.github.io/).
 Cover photo credit to [SeNSE Lab](http://journals.plos.org/ploscompbiol/issue?id=10.1371/issue.pcbi.v07.i04).
 
-By passive sensing, that is randomly querying the environment, an agent will need on average 15 / 36 attempts to estimate the shape accurately, while active choosing what to query allows an average 8 attempts to achieve the same accuracy.
 
-![](images/se_train.png)
 
 
 
