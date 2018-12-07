@@ -2,6 +2,8 @@
 
 In a 2017 NIPS paper [Toward Goal-Driven Neural Network Models for the Rodent Whisker-Trigeminal System](https://arxiv.org/abs/1706.07555), several deep neural networks that input whisker array information such as bending and twisting are trained for shape detection.The best top-5 accuracy is 44.8%, while chance is 0.85%. One potential improvement on this performance is active sensing, as the current sensing data are obtained from passive sweeping the whisker array against objects. Incorporating active whiskering based on past sensing signals reflects how rats behave in real world and can potentially improve the efficiency and accuracy of shape detection.
 
+![simulation](images/teddy.gif)
+
 ### Model Abstraction
 
 The goal is to learn an optimal controller for a whisker array in space around an object to collect observations in order to sequentially improve the estimation of the object shape in an efficient manner. As a starter, I have simplified the problem to a 2d classification of triangles and hexagons and also the whisker array to a radially outward positioned laser array. The idea is that rats can figure out the distance between contact points and their corresponding whisker base from whisker signals. So we are using Euclidean distances as classification input.
@@ -19,13 +21,23 @@ On average the whisker array is able to move to most differentiating regions and
 ![](images/hex_6step.png)
 ![](images/tri_6step.png)
 
-## More details to come!
-
 Detailed and updated description of my current results can be found in this [project report](dqn_active_whisking.pdf).
+
+### Active Sensing - Shape Estimation via DQN
+
+One undesirable trait of the above work is reward shaping. Ideally, we would want the dqn agent to discover a policy that chases information rather than implicitly instruct it to do so. This motivates us to have a better representation of the state and by doing so the same algorithm can learn to collect information aggressively without reward shaping in the following shape estimation task.
+
+<!-- ![](images/se2.gif) -->
+<img src="images/se2.gif" alt="se2" style="width:300px;height:100px;">
+<img src="images/se3.gif" alt="se3" style="width:300px;height:100px;">
+
 
 For more information, you can find me at my [portfolio page](https://yanweiw.github.io/).
 Cover photo credit to [SeNSE Lab](http://journals.plos.org/ploscompbiol/issue?id=10.1371/issue.pcbi.v07.i04).
 
+By passive sensing, that is randomly querying the environment, an agent will need on average 15 / 36 attempts to estimate the shape accurately, while active choosing what to query allows an average 8 attempts to achieve the same accuracy.
+
+![](images/se_train.png)
 
 
 
