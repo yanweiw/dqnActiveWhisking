@@ -1,25 +1,39 @@
 # Deep Q-Learning for Active Sensing
 
-This research project studies how **active sensing**, i.e. choosing what data to collect, can improve data efficiency for **decision making under uncertainty**. Inspired by the active whisking behavior of rats, we use simulated rat whisker sensory signals as a model for **spatial-temporal** data to learn policies that first collect observations and then classify object shapes. We found
+This research project studies how **active sensing**, i.e. choosing what data to collect, can improve data efficiency for **decision making under uncertainty**. Inspired by the active whisking behavior of rats, we use simulated rat whisker sensory signals as a model for **spatial-temporal** data to learn policies that first collect observations and then classify object shapes. We have found
 
 * Spatial frequency in tactile sensing is integral to object classification
 * Shaping reward to query information-rich regions accelerates the learning process
-* Adding structures to elicit a better state representation can lead to efficient learning without reward shaping
-
-
-In a 2017 NeurIPS paper [Toward Goal-Driven Neural Network Models for the Rodent Whisker-Trigeminal System](https://arxiv.org/abs/1706.07555), several deep neural networks that input whisker array information such as bending and twisting are trained for shape detection.The best top-5 accuracy is 44.8%, while chance is 0.85%. One potential improvement on this performance is active sensing, as the current sensing data are obtained from passive sweeping the whisker array against objects. Incorporating active whiskering based on past sensing signals reflects how rats behave in real world and can potentially improve the efficiency and accuracy of shape detection.
+* Adding a **recurrent state estimation** structure to the learning pipeline can lead to efficient learning without reward shaping
 
 ![simulation](images/teddy.gif)
 
-### Model Abstraction
+Fig 1. Simulated whisking against a teddy bear
+
+## Motivation
+
+In a 2017 NeurIPS paper [Toward Goal-Driven Neural Network Models for the Rodent Whisker-Trigeminal System](https://arxiv.org/abs/1706.07555), several deep neural networks of distinct architectures that input whisker array information such as bending and twisting are trained for shape detection.The best top-5 accuracy is 44.8%, while chance is 0.85%. We aim to improve this result on two fronts.
+* The current sensory data are obtained from passive sweeping the whisker array against objects, as illustrated in Fig 1. Incorporating active whisking based on past sensory signals reflects how rats behave in real world and can improve the efficiency and accuracy of shape detection. This work is documented below in **subproject I & II**.
+* We find the whisker model presented in the paper not biologically realistic. We show that data acquired at a higher sampling frequency with a better whisker model can achieve robust object classification results using just SVM, disputing the need for deep neural networks. This work is documented in **subproject III**.
+
+## Subproject I - Shape Classification using an Abstracted Whisker Model
+
+### Problem Statement
 
 The goal is to learn an optimal controller for a whisker array in space around an object to collect observations in order to sequentially improve the estimation of the object shape in an efficient manner. As a starter, I have simplified the problem to a 2d classification of triangles and hexagons and also the whisker array to a radially outward positioned laser array. The idea is that rats can figure out the distance between contact points and their corresponding whisker base from whisker signals. So we are using Euclidean distances as classification input.
 
-![Laser Array](images/laser_array.png)
+<!-- ![Laser Array](images/laser_array.png) -->
+<img src="images/laser_array.png" alt="se2" style="width:600px;height:200px;">
 
-### DQN Algorithm
+Fig 2. An abstracted whisker array to simplify data complexity
 
-![DQN Algorithm](images/dqnAlgorithm.png)
+### Method
+
+We use Deep Q-Learning (Mnih, et al)
+
+<!-- ![DQN Algorithm](images/dqnAlgorithm.png) -->
+<img src="images/dqnAlgorithm.png" alt="se2" style="width:600px;height:450px;">
+
 
 ### Results
 
@@ -27,8 +41,8 @@ On average the whisker array is able to move to most differentiating regions and
 
 <!-- ![](images/hex_6step.png)
 ![](images/tri_6step.png) -->
-<img src="images/hex_6step.png" alt="se2" style="width:600px;height:300px;">
-<img src="images/tri_6step.png" alt="se2" style="width:600px;height:300px;">
+<img src="images/hex_6step.png" alt="se2" style="width:420px;height:280px;">
+<img src="images/tri_6step.png" alt="se2" style="width:420px;height:280px;">
 
 Detailed and updated description of my current results can be found in this [project report](dqn_active_whisking.pdf).
 
@@ -37,8 +51,8 @@ Detailed and updated description of my current results can be found in this [pro
 One undesirable trait of the above work is reward shaping. Ideally, we would want the dqn agent to discover a policy that chases information rather than implicitly instruct it to do so. This motivates us to have a better representation of the state and by doing so the same algorithm can learn to collect information aggressively without reward shaping in the following shape estimation task.
 
 <!-- ![](images/se2.gif) -->
-<img src="images/se2l.gif" alt="se2" style="width:600px;height:200px;">
-<img src="images/se3l.gif" alt="se3" style="width:600px;height:200px;">
+<img src="images/se2.gif" alt="se2" style="width:420px;height:140px;">
+<img src="images/se3.gif" alt="se3" style="width:420px;height:140px;">
 
 
 By passive sensing, that is randomly querying the environment, an agent will need on average 15 / 36 attempts to estimate the shape accurately, while active choosing what to query allows an average 8 attempts to achieve the same accuracy.
