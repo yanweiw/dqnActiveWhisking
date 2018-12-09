@@ -41,7 +41,7 @@ On average the whisker array is able to move to most differentiating regions and
 
 <!-- ![](images/hex_6step.png)
 ![](images/tri_6step.png) -->
-<img src="images/hex_6step.png" width="420" height="280" ><img src="images/tri_6step.png" width="420" height="280" >
+<img src="images/hex_6step.png" width="450" height="300" ><img src="images/tri_6step.png" width="450" height="300" >
 
 Detailed and updated description of my current results can be found in this [project report](dqn_active_whisking.pdf).
 
