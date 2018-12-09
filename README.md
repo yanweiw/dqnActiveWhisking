@@ -4,7 +4,7 @@ This research project studies how **active sensing**, i.e. choosing what data to
 
 * Spatial frequency in tactile sensing is integral to object classification
 * Shaping reward to query information-rich regions accelerates the learning process
-* Adding a **recurrent state estimation** structure to learning can lead to efficient learning without reward shaping
+* Adding a **recurrent state estimation** structure can lead to efficient learning without reward shaping
 
 ![simulation](images/teddy.gif)
 
@@ -29,21 +29,29 @@ Fig 2. An abstracted whisker array to simplify data complexity
 
 ### Method
 
-We use Deep Q-Learning (Mnih, et al)
+We use a [Deep Q-Network (Mnih, et al)](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) to learn the active placement of a sparse sensor, characterized by only 19 distance measurements. We initialize a perception network that can predict the correct classification given salient observations distinct to each object. We test on a CNN and RNN and we find CNN gives better training signals than RNN to DQN. We posit that the vanilla RNN struggles to internally synthesize an accurate state representation recurrently. We test the importance of learning a good representation in subproject II. A detailed illustration of the algorithm is listed in Fig 3.
 
 <!-- ![DQN Algorithm](images/dqnAlgorithm.png) -->
 <img src="images/dqnAlgorithm.png" width="600" height="450" >
 
+Fig 3. Customized DQN algorithm, where DQN represents a policy learner, RNN a perception network, and Bullet a simulation engine
 
-### Results
 
-On average the whisker array is able to move to most differentiating regions and collect observation that gives rise to a 90% confident classification within 10 steps.
+### Results & Contributions
+
+Initially, we make reward 10 if the perception network can output a correct prediction and -1 otherwise to account for time and energy cost. This naive approach fails due to:
+* the reward is too sparse and consequently the agent learns to stay put as most attempts beget a negative reward
+* without an explicit structure, the perception network fails to learn implicitly a good representation of the state.
+
+We test the second hypothesis in subproject II and the first hypothesis here by shaping the reward to include **a entropy term that characterizes the information richness of an observation**. This change smooths the reward terrain and focuses the exploration on high-curvature regions such as edges. Consequently, the DQN learns a strategy to move towards edges and corners to collect observations, and on average the agent is able to predict shapes with a 90% confidence within 10 steps.
 
 <!-- ![](images/hex_6step.png)
 ![](images/tri_6step.png) -->
 <img src="images/hex_6step.png" width="420" height="280" ><img src="images/tri_6step.png" width="420" height="280" >
 
-Detailed and updated description of my current results can be found in this [project report](dqn_active_whisking.pdf).
+Fig 4. Two trajectories of active sensor placement. Red dots indicate contact points on shape and return distance measurements while black dots indicate "off shape" and return infinity. Since the 19 distance sensors are radially outward positioned, dots converge as the sensor moves near an object.  
+
+Detailed description can be found in this [project report](dqn_active_whisking.pdf).
 
 ### Active Sensing - Shape Estimation via DQN
 
