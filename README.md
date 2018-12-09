@@ -32,7 +32,7 @@ Fig 2. An abstracted whisker array to simplify data complexity
 We use a [Deep Q-Network (Mnih, et al)](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) to learn the active placement of a sparse sensor, characterized by only 19 distance measurements. We initialize a perception network that can predict the correct classification given salient observations distinct to each object. We test on a CNN and RNN and we find CNN gives better training signals than RNN to DQN. We posit that the vanilla RNN struggles to internally synthesize an accurate state representation recurrently. We test the importance of learning a good representation in subproject II. A detailed illustration of the algorithm is listed in Fig 3.
 
 <!-- ![DQN Algorithm](images/dqnAlgorithm.png) -->
-<img src="images/dqnAlgorithm.png" width="600" height="450" >
+<img src="images/dqnAlgorithm.png" width="720" height="540" >
 
 Fig 3. Customized DQN algorithm, where DQN represents a policy learner, RNN a perception network, and Bullet a simulation engine
 
@@ -53,7 +53,7 @@ Fig 4. Two trajectories of active sensor placement. Red dots indicate contact po
 
 Detailed description can be found in this [project report](dqn_active_whisking.pdf).
 
-### Active Sensing - Shape Estimation via DQN
+## Active Sensing - Shape Estimation via DQN
 
 One undesirable trait of the above work is reward shaping. Ideally, we would want the dqn agent to discover a policy that chases information rather than implicitly instruct it to do so. This motivates us to have a better representation of the state and by doing so the same algorithm can learn to collect information aggressively without reward shaping in the following shape estimation task.
 
