@@ -41,8 +41,7 @@ On average the whisker array is able to move to most differentiating regions and
 
 <!-- ![](images/hex_6step.png)
 ![](images/tri_6step.png) -->
-<img src="images/hex_6step.png" width="420" height="280" >
-<img src="images/tri_6step.png" width="420" height="280" >
+|<img src="images/hex_6step.png" width="420" height="280" >|<img src="images/tri_6step.png" width="420" height="280" >|
 
 Detailed and updated description of my current results can be found in this [project report](dqn_active_whisking.pdf).
 
@@ -51,8 +50,8 @@ Detailed and updated description of my current results can be found in this [pro
 One undesirable trait of the above work is reward shaping. Ideally, we would want the dqn agent to discover a policy that chases information rather than implicitly instruct it to do so. This motivates us to have a better representation of the state and by doing so the same algorithm can learn to collect information aggressively without reward shaping in the following shape estimation task.
 
 <!-- ![](images/se2.gif) -->
-<img src="images/se2.gif" width="420" height="140" >
-<img src="images/se3.gif" width="420" height="140" >
+|<img src="images/se2.gif" width="420" height="140" >|
+<img src="images/se3.gif" width="420" height="140" >|
 
 
 By passive sensing, that is randomly querying the environment, an agent will need on average 15 / 36 attempts to estimate the shape accurately, while active choosing what to query allows an average 8 attempts to achieve the same accuracy.
