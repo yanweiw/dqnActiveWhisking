@@ -82,7 +82,7 @@ After training the perception network, we seek to directly optimize the query se
 
 We train the DQN to recurrently update the belief in however manner it finds most efficient without reward shaping. Training converges after 1.3 million epochs and the average number of queries drops from 15 random ones to 8 active ones as shown in Fig 7. Our work shows active sensing outperforms passive random sensing by around 7 out of total 36 attempts (8 vs 15) in terms of data efficiency while achieving the same accuracy on this shape estimation task.  
 
-<img src="images/se_train.png" width="500" height="280" >
+<img src="images/se_train.png" width="600" height="350" >
 
 Fig 7. Average rewards and steps evolution. Each unit of x axis is 50 epochs.
 
@@ -99,6 +99,7 @@ We generate and process the data as outlined in the paper using our new whisker 
 |<img src="images/dvb1.png" width="300" height="200" >|<img src="images/dvb3.png" width="300" height="200">|
 |-----------------------------------------------------|----------------------------------------------------|
 |Downsampled to 250 timesteps, top accuracy: 86%      |Downsampled to 100 timesteps, top accuracy: 73%     |
+
 Fig 8. Binary classification results vs feature vector lengths. Red dots represent accuracy and blue curve represents standard deviation. Accuracy improves as we include more features during the SVM fitting
 
 ### 10-Way Multi-class SVM Classification
