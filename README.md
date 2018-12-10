@@ -16,7 +16,7 @@ In a 2017 NeurIPS paper [Toward Goal-Driven Neural Network Models for the Rodent
 * The current sensory data are obtained from passive sweeping the whisker array against objects, as illustrated in Fig 1. Incorporating active whisking based on past sensory signals reflects how rats behave in real world and can improve the efficiency and accuracy of shape detection. This work is documented below in **subproject I & II**.
 * We find the whisker model presented in the paper not biologically realistic. We show that data acquired at a higher sampling frequency with a better whisker model can achieve robust object classification results using just SVM, disputing the need for deep neural networks. This work is documented in **subproject III**.
 
-## Subproject I - Shape Classification using an Abstracted Whisker Model
+## Subproject I - Shape Classification with an Abstracted Whisker Model
 
 ### Problem Statement
 
@@ -43,7 +43,7 @@ Initially, we make reward 10 if the perception network can output a correct pred
 * the reward is too sparse and consequently the agent learns to stay put as most attempts beget a negative reward
 * without an explicit structure, the perception network fails to learn implicitly a good representation of the state.
 
-We test the second hypothesis in subproject II and the first hypothesis here by shaping the reward to include **a entropy term that characterizes the information richness of an observation**. This change smooths the reward terrain and focuses the exploration on high-curvature regions such as edges. Consequently, the DQN learns a strategy to move towards edges and corners to collect observations, and on average the agent is able to predict shapes with a 90% confidence within 10 steps.
+We test the second hypothesis in subproject II and the first hypothesis here by shaping the reward to include **a entropy term that characterizes the information richness of an observation**. This change smooths out the reward terrain and focuses the exploration on high-curvature regions such as edges. Consequently, the DQN learns a strategy to move towards edges and corners to collect observations, and on average the agent is able to predict shapes with a 90% confidence within 10 steps, compared to a 15-step average by random passive sampling.
 
 <!-- ![](images/hex_6step.png)
 ![](images/tri_6step.png) -->
@@ -53,17 +53,48 @@ Fig 4. Two trajectories of active sensor placement. Red dots indicate contact po
 
 Detailed description can be found in this [project report](dqn_active_whisking.pdf).
 
-## Active Sensing - Shape Estimation via DQN
+## Subproject II - Shape Estimation via Active Sensing
 
-One undesirable trait of the above work is reward shaping. Ideally, we would want the dqn agent to discover a policy that chases information rather than implicitly instruct it to do so. This motivates us to have a better representation of the state and by doing so the same algorithm can learn to collect information aggressively without reward shaping in the following shape estimation task.
+### Motivation
+
+Despite efficient classification with partial observations in subproject I, we acknowledge the lack of generality due to reward shaping with physics priors. We want to learn a policy without any heuristics such as [information-based exploration principles](https://github.com/yanweiw/infotaxis). We attempt the same active sensing problem with a shape estimation task on a grid world. There has been [model-based work in this domain using ergodicity (Abraham, et al)](https://arxiv.org/pdf/1709.01560.pdf) and our work differs in that such strategy is purely learned from data without explicit analytical models.
+
+### Problem Statement & Method
+
+Given an image corrupted by noises, we want to sequentially uncover a patch (in total 6 x 6 patches) to obtain a partial observation of the ground truth in order to estimate the shape in the image. We improve upon the DQN method in subproject I by eliciting the learning of state representation and subsequently training decision-making upon explicit state representations. By enforcing such a structure the same algorithm can learn to collect information aggressively without reward shaping.
+
+Specifically, we first train a [U-net (Ronneberger, et al)](https://arxiv.org/abs/1505.04597) like perception network to fully convolutionally predict dense representation of partially uncovered noisy images. In Fig 5, we show state representations after randomly uncovering 1 - 18 patches. On average, the trained perception network can estimate with 95% accuracy after 15 **random** partial observations.
+
+<img src="images/rand0.png" width="700" height="200" >
+<img src="images/rand1.png" width="700" height="200" >
+<img src="images/rand2.png" width="700" height="200" >
+
+Fig 5. Shape estimations after random queries
+
+After training the perception network, we seek to directly optimize the query sequence upon these explicit state representations, which can be interpreted as belief states from a POMDP perspective. Rewards are directly linked to binary entropy loss between the belief and the ground truth and thus naturally less sparse. Fig 5. also shows a positive correlation between the number of observations and the accuracy of beliefs.
+
+### Results & Contributions
+
+We train the DQN to recurrently update the belief in however manner it finds most efficient without reward shaping. Training converges after 1.3 million epochs and the average number of queries drops from 15 random ones to 8 active ones as shown in Fig 6.
+
+<img src="images/se_train.png" width="500" height="280" >
+
+Fig 6. Average rewards and steps evolution. Each unit of x axis is 50 epochs.
+
+Our work shows active sensing outperforms passive random sensing by around 7 out of total 36 attempts (8 vs 15) in terms of data efficiency while achieving the same accuracy on this shape estimation task. We also show that **building recurrent structures to enforce the agent to learn an accurate state representation eases learning and reduces the need for reward shaping.** Fig 7. shows two example active sensing sequence that recurrently updates beliefs.
 
 <!-- ![](images/se2.gif) -->
 <img src="images/se2.gif" width="420" height="140" ><img src="images/se3.gif" width="420" height="140" >
 
+Fig 7. Example active sensing sequence
 
-By passive sensing, that is randomly querying the environment, an agent will need on average 15 / 36 attempts to estimate the shape accurately, while active choosing what to query allows an average 8 attempts to achieve the same accuracy.
+## Subproject III - Investigating Complexity of Spatial-temporal Tactile Data
 
-![](images/se_train.png)
+
+
+
+
+
 
 
 For more information, you can find me at my [portfolio page](https://yanweiw.github.io/).
