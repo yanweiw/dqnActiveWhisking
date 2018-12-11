@@ -13,49 +13,49 @@ Fig 1. Simulated whisking against a teddy bear
 ## Motivation
 
 In a 2017 NeurIPS paper [Toward Goal-Driven Neural Network Models for the Rodent Whisker-Trigeminal System](https://arxiv.org/abs/1706.07555), several deep neural networks of distinct architectures that input whisker array information such as bending and twisting are trained for shape detection.The best top-5 accuracy is 44.8%, while chance is 0.85%. We aim to improve this result on two fronts.
-* The current sensory data are obtained from passive sweeping the whisker array against objects, as illustrated in Fig 1. Incorporating active whisking based on past sensory signals reflects how rats behave in real world and can improve the efficiency and accuracy of shape detection. This work is documented below in **subproject I & II**.
-* We find the whisker model presented in the paper not biologically realistic. We show that data acquired at a higher sampling frequency with a better whisker model can achieve robust object shape classification results using just SVM, disputing the need for deep neural networks. This work is documented in **subproject III**.
+* The current sensory data are obtained from passive sweeping the whisker array against objects, as illustrated in Fig 1. Incorporating active whisking based on past sensory signals reflects how rats behave in the real world and can improve the efficiency and accuracy of shape detection. This work is documented below in **subproject I & II**.
+* We find the whisker model presented in the paper not biologically realistic. We show that data acquired at a higher sampling frequency with a better whisker model can achieve robust object shape classification using just SVM, disputing the need for deep neural networks. This work is documented in **subproject III**.
 
 ## Subproject I - Shape Classification with an Abstracted Whisker Model
 
 ### Problem Statement
 
-The goal is to learn an optimal controller for a whisker array in space around an object to collect observations in order to sequentially improve the estimation of the object shape in an efficient manner. As a starter, I have simplified the problem to a 2d classification of triangles and hexagons and also the whisker array to a radially outward positioned laser array. The idea is that rats can figure out the distance between contact points and their corresponding whisker base from whisker signals. So we are using Euclidean distances as classification input.
+The goal is to learn an optimal controller for the active placement of a tactile sensor to achieve efficient sequential shape estimation. To reduce computational complexity, I consider a classification task of 2D shapes and replace the whisker array with a distance-measuring laser array. The simplification of the tactile sensor model is motivated by the evidence that rats can infer the distance between contact points and their corresponding whisker base from whisker signals. Therefore we simply tactile signals to Euclidean distance as the input for classification.
 
 <!-- ![Laser Array](images/laser_array.png) -->
 <img src="images/laser_array.png" width="600" height="200" >
 
-Fig 2. An abstracted whisker array to simplify data complexity
+Fig 2. An abstracted whisker array of radially outward positioned lasers
 
 ### Method
 
-We use a [Deep Q-Network (Mnih, et al)](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) to learn the active placement of a sparse sensor, characterized by only 19 distance measurements. We initialize a perception network that can predict the correct classification given salient observations distinct to each object. We test on a CNN and RNN and we find CNN gives better training signals than RNN to DQN. We posit that the vanilla RNN struggles to internally synthesize an accurate state representation recurrently. We test the importance of learning a good representation in subproject II. A detailed illustration of the algorithm is listed in Fig 3.
+We use a [Deep Q-Network (Mnih, et al)](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) to learn the active placement of a sparse sensor, characterized by only 19 distance measurements. We initialize a perception network that can predict the correct classification given salient observations distinct to each object. We test on a CNN and a RNN and find CNN provides better training signals than RNN to DQN. We posit that the vanilla RNN struggles to internally synthesize an accurate state representation recurrently. We test the importance of learning a good representation in subproject II. A detailed illustration of the algorithm is listed in Fig 3.
 
 <!-- ![DQN Algorithm](images/dqnAlgorithm.png) -->
 <img src="images/dqnAlgorithm.png" width="720" height="540" >
 
-Fig 3. Customized DQN algorithm, where DQN represents a policy learner, RNN a perception network, and Bullet a simulation engine
+Fig 3. Customized DQN algorithm, where DQN represents the policy learner, RNN the perception network, and Bullet the simulation engine
 
 
-### Results & Contributions
+### Results & Contribution
 
 Initially, we make reward 10 if the perception network can output a correct prediction and -1 otherwise to account for time and energy cost. This naive approach fails due to:
 * the reward is too sparse and consequently the agent learns to stay put as most attempts beget a negative reward
 * without an explicit structure, the perception network fails to learn implicitly a good representation of the state.
 
-We test the second hypothesis in subproject II and the first hypothesis here by shaping the reward to include **a entropy term that characterizes the information richness of an observation**. This change smooths out the reward terrain and focuses the exploration on high-curvature regions such as edges. Consequently, the DQN learns a strategy to move towards edges and corners to collect observations, and on average the agent is able to predict shapes with a 90% confidence within 10 steps, compared to a 15-step average by random passive sampling.
+We test the second hypothesis in subproject II and the first hypothesis here by shaping the reward to include **a entropy term that characterizes the information richness of an observation**. This change smooths out the reward terrain and focuses the exploration on high-curvature regions such as edges. Consequently, the DQN learns a strategy to move towards edges and corners to collect observations, and on average the agent is able to predict shapes with a 90% confidence within 10 steps, compared to a 15-step average through random passive sampling.
 
 <!-- ![](images/hex_6step.png)
 ![](images/tri_6step.png) -->
 <img src="images/hex_6step.png" width="420" height="280" ><img src="images/tri_6step.png" width="420" height="280" >
 
-Fig 4. Two trajectories of active sensor placement. Red dots indicate contact points on shape and return distance measurements while black dots indicate "off shape" and return infinity. Since the 19 distance sensors are radially outward positioned, dots converge as the sensor moves near an object.  
+Fig 4. Two trajectories of active sensor placement. Red dots indicate contact points on shape and distance measurements are returned while black dots indicate "off shape" and infinity is returned. Since the 19 distance sensors are radially outward positioned, dots converge as the sensor moves closer to an object.  
 
 Detailed description can be found in this [project report](dqn_active_whisking.pdf).
 
 ## Subproject II - Shape Estimation via Active Sensing
 
-### Contributions
+### Contribution
 
 Despite efficient classification with partial observations in subproject I, we acknowledge the lack of generality due to reward shaping with physics priors. We want to learn a policy without any heuristics such as [information-based exploration principles](https://github.com/yanweiw/infotaxis). We attempt the same active sensing problem with a shape estimation task on a grid world. There has been [model-based work in this domain using ergodicity (Abraham, et al)](https://arxiv.org/pdf/1709.01560.pdf) and our work differs in that such strategy is purely learned from data without explicit analytical models. We show that **building recurrent structures to enforce the agent to learn an accurate state representation eases learning and reduces the need for reward shaping.**
 
@@ -66,9 +66,9 @@ Fig 5. Learned active sensing sequence
 
 ### Problem Statement & Method
 
-Given an image corrupted by noises, we want to sequentially uncover a patch (in total 6 x 6 patches) to obtain a partial observation of the ground truth in order to estimate the shape in the image. We improve upon the DQN method in subproject I by eliciting the learning of state representation and subsequently training decision-making upon explicit state representations. By enforcing such a structure the same algorithm can learn to collect information aggressively without reward shaping.
+Given an image corrupted by noises, we want to sequentially uncover a patch (in total 6 x 6 patches) to obtain partial observations of the ground truth in order to estimate the shape in the image. We improve upon the DQN method in subproject I by eliciting the learning of state representation and subsequently training decision-making directly upon these explicit state representations. By enforcing such a structure the same algorithm can learn to collect information aggressively without reward shaping.
 
-Specifically, we first train a [U-net (Ronneberger, et al)](https://arxiv.org/abs/1505.04597) like perception network to fully convolutionally predict dense representation of partially uncovered noisy images. In Fig 6, we show state representations after randomly uncovering 1 - 18 patches. On average, the trained perception network can estimate with 95% accuracy after 15 **random** partial observations.
+Specifically, we first train a [U-net (Ronneberger, et al)](https://arxiv.org/abs/1505.04597) like perception network to fully convolutionally predict the dense representation of a partially uncovered noisy image. In Fig 6, we show state representations after randomly uncovering 1 - 18 patches. On average, the trained perception network can estimate with 95% accuracy after 15 **random** partial observations.
 
 <img src="images/rand0.png" width="700" height="200" >
 <img src="images/rand1.png" width="700" height="200" >
@@ -80,21 +80,21 @@ After training the perception network, we seek to directly optimize the query se
 
 ### Results
 
-We train the DQN to recurrently update the belief in however manner it finds most efficient without reward shaping. Training converges after 1.3 million epochs and the average number of queries drops from 15 random ones to 8 active ones as shown in Fig 7. Our work shows active sensing outperforms passive random sensing by around 7 out of total 36 attempts (8 vs 15) in terms of data efficiency while achieving the same accuracy on this shape estimation task.  
+We train the DQN to **recurrently update the belief** in however manner it finds most efficient without reward shaping. Training converges after 1.3 million epochs and the average number of queries drops from 15 random ones to 8 active ones as shown in Fig 7. Our work shows active sensing outperforms passive random sensing by around 7 out of total 36 attempts (8 vs 15) in terms of data efficiency while achieving the same accuracy on this shape estimation task.  
 
 <img src="images/se_train.png" width="600" height="350" >
 
 Fig 7. Average rewards and steps evolution. Each unit of x axis is 50 epochs.
 
-## Subproject III - Investigating Complexity of Spatial-temporal Tactile Data
+## Subproject III - Investigating Spatial-Temporal Tactile Data Complexity
 
-### Contributions
+### Contribution
 
-In this subproject we investigate data complexity of the passive sweeping dataset used in the aforementioned [2017 NeurIPS paper](https://arxiv.org/abs/1706.07555) and generated by means shown in Fig 1. The paper claims in the validation experiment, binary linear SVM is not sufficient to separate ducks from bears in the presence of scale, speed, position, and orientation variation, thus calling for the use of deep neural networks, indicating the need for rat cortex in classification tasks from a neuroscience perspective. We believe higher perception structure such as cortex is not necessary in this process and dispute the paper's claim by showing a better whisker model sampling at a higher frequency can lead to linearly separable dataset that precludes the need for DNN.
+In this subproject we investigate data complexity of the passive sweeping dataset generated by means shown in Fig 1 and used in the aforementioned [2017 NeurIPS paper.](https://arxiv.org/abs/1706.07555) The paper claims in its validation experiment, binary linear SVM is not sufficient to separate ducks from bears in the presence of scale, speed, position, and orientation variation, and thus proceeds to use deep neural networks. This seems to suggest the indispensable role the rat cortex plays in such classification tasks from a neuroscience perspective. We believe higher perception structure such as cortex is not necessary in this process and dispute the paper's claim by showing that a better whisker model sampling at a higher frequency can lead to linearly separable dataset, dismissing the need for DNN.
 
 ### Bear vs Duck Binary SVM Classification
 
-We generate and process the data as outlined in the paper using our new whisker model and sampling frequency at 200 Hz rather than the 100 Hz in the paper. We perform binary SVM classimaiton on a Bear and Duck passive sweeping dataset with variations in scale, speed, position, and orientation. We show results in Fig 8. that accuracy decreases significantly as we down-samples the dataset in the temporal domain, which verifies the importance of spatial frequency in classification tasks.
+We generate and process the data as outlined in the paper using our new whisker model and a sampling frequency at 200 Hz instead of the 100 Hz used in the paper. We perform binary SVM classimaiton on a Bear and Duck passive sweeping dataset with variations in scale, speed, position, and orientation. We show results in Fig 8. that the classification accuracy decreases significantly as we down-samples the dataset in the temporal domain, which verifies the importance of spatial frequency in classification tasks.
 
 |<img src="images/dvb1.png" width="300" height="200" >|<img src="images/dvb3.png" width="300" height="200">|
 |-----------------------------------------------------|----------------------------------------------------|
@@ -104,7 +104,7 @@ Fig 8. Binary classification results vs feature vector lengths. Red dots represe
 
 ### 10-Way Multi-class SVM Classification
 
-We further test our assumption that one can infer from raw spatial-temporal data from tactile sensors the shape of an object without complex non-linear processing by attempting SVM classification on 10 objects of distinct topology. We report the accuracy results and confusion matrix in Fig 9. As we are able to achieve 56% accuracy, significantly outperforming a chance accuracy of 10%, we conclude neither DNN nor the biological parallel cortex is warranted in this object shape classification task.
+We further test our assumption that one can infer from raw spatial-temporal tactile data the shape of an object without complex non-linear processing by attempting SVM classification on 10 objects of distinct topology. We report the accuracy results and confusion matrix in Fig 9. As we are able to achieve 56% accuracy at best, significantly outperforming a chance accuracy of 10%, we conclude DNN, the artificial parallel of cortex, is not warranted in this shape classification task.
 
 |<img src="images/dvb4.png" width="300" height="200" >|<img src="images/dvb5.png" width="350" height="350" >|
 |-----------------------------------------------------|-----------------------------------------------------|
