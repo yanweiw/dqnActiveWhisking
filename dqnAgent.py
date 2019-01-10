@@ -1,5 +1,4 @@
 # Felix Yanwei Wang @ Northwestern University MSR, Feb 2018
-# Acknowledgement: code borrows heavily from https://keon.io/deep-q-learning/#Cartpole-Game
 
 from collections import deque
 from keras.models import Sequential

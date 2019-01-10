@@ -161,7 +161,7 @@ def getDist(config, draw=False):
     categories[0,0] = population[0, 0]
     categories[0,1] = population[0, 1:7].sum()
     categories[0,2] = population[0, 7:19].sum()
-    categories[0,3] = 19 - population.sum() 
+    categories[0,3] = 19 - population.sum()
     return distances, categories
 
 

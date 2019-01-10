@@ -1,5 +1,4 @@
 # Felix Yanwei Wang @ Northwestern University MSR, Feb 2018
-# Acknowledgement: code borrows heavily from https://keon.io/deep-q-learning/#Cartpole-Game
 
 from keras.models import load_model
 # from dqnEnv import dqnEnv
